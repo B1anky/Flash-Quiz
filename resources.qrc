@@ -2,7 +2,4 @@
     <qresource prefix="/new/pictures">
         <file>flash-card.png</file>
     </qresource>
-    <qresource prefix="/data">
-        <file>data.txt</file>
-    </qresource>
 </RCC>

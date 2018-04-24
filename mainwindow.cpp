@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     //Flashcard set up
     int windowH = 1080;
     int windowW = 1500;
-    QLabel* backGround = new QLabel();
+    backGround = new QLabel();
     backGround->setGeometry(QRect(203, 10, windowW, windowH));
 
     pix1 = new QPixmap(":/new/pictures/flash-card.png");
@@ -20,13 +20,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     initializeMenuButtons();
     initializeBackButton();
     initializeNewCard();
+    // don't init until button clicked initializeNewQuiz();
     showMenu();
 
 
     backGroundLayout->addWidget(backGround);
     backGroundLayout->setAlignment(Qt::AlignCenter);
 
-    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout = new QGridLayout(this);
     mainLayout->addLayout(backGroundLayout, 0, 0, Qt::AlignCenter);
 
     this->centralWidget()->setLayout(mainLayout);
@@ -331,7 +332,12 @@ void MainWindow::on_lightningQuizButton_clicked(){
 void MainWindow::on_statisticsButton_clicked(){
 
 }
-
+/*
+void MainWindow::on_QuizEdit_backButton_clicked(){
+    hideQuizMenu();
+    showMenu();
+}
+*/
 void MainWindow::on_backButton_clicked(){
     hideNewCard();
     hideQuizMenu();
@@ -340,56 +346,117 @@ void MainWindow::on_backButton_clicked(){
 
 
 void MainWindow::initializeNewQuiz(){
-    //Set up text edit for quiz name
-    quizTitleText = new MyTextEdit;
-    quizTitleText->setDefaultText("Quiz name here");
-    quizTitleText->setText(quizTitleText->getDefaultText());
-    quizTitleText->setParent(this);
-    quizTitleText->setFixedHeight(buttonHeight);
-    quizTitleText->setFixedWidth(2 * buttonWidth);
-    quizTitleText->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
-    quizTitleText->move(210, 215);
-    quizTitleText->setFont(*cardFont);
-    quizTitleText->hide();
+    qInfo() << "Here 1";
+    backGround->setPixmap(*new QPixmap());
+    verticalLayoutWidget = new QWidget(this->centralWidget());
+    verticalLayoutWidget->setObjectName(QStringLiteral("verticalLayoutWidget"));
+    verticalLayoutWidget->setGeometry(QRect(10, 0, 951, 1021));
+    verticalLayout = new QVBoxLayout(verticalLayoutWidget);
+    verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+    verticalLayout->setContentsMargins(0, 0, 0, 0);
+    verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-    //set up create quiz button
-    makeNewQuizButton = new QPushButton;
-    makeNewQuizButton->setText("Create Quiz");
-    makeNewQuizButton->setFont(*cardFont);
-    makeNewQuizButton->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
-    makeNewQuizButton->setParent(this);
-    makeNewQuizButton->setFixedHeight(buttonHeight);
-    makeNewQuizButton->setFixedWidth(buttonWidth);
-    makeNewQuizButton->move(210 + 750 + buttonWidth , 85);
-    makeNewQuizButton->hide();
+    verticalLayout->addItem(verticalSpacer_5);
 
+    textEdit = new QTextEdit(verticalLayoutWidget);
+    textEdit->setObjectName(QStringLiteral("textEdit"));
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    sizePolicy.setHorizontalStretch(0);
+    sizePolicy.setVerticalStretch(0);
+    sizePolicy.setHeightForWidth(textEdit->sizePolicy().hasHeightForWidth());
+    textEdit->setSizePolicy(sizePolicy);
+    textEdit->setMinimumSize(QSize(0, 50));
+    textEdit->setMaximumSize(QSize(16777215, 50));
 
-    //Need to add all flash cards to a scroll area
-    cardArea = new QScrollArea();
+    verticalLayout->addWidget(textEdit);
 
-    userCards = new QListWidget;
-    for(auto card: cardList){
-        QString eng = card.getEnglish();
-        QString pin = card.getPinyin();
-        QString chn = card.getChinese();
+    verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        QuizCard* curQuizCard = new QuizCard(eng, pin, chn);
-        userCards->addItem(curQuizCard);
+    verticalLayout->addItem(verticalSpacer_6);
+
+    verticalSpacer = new QSpacerItem(10, 1, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+    verticalLayout->addItem(verticalSpacer);
+
+    pushButton = new QPushButton(verticalLayoutWidget);
+    pushButton->setObjectName(QStringLiteral("pushButton"));
+    pushButton->setMinimumSize(QSize(0, 50));
+
+    verticalLayout->addWidget(pushButton);
+
+    verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayout->addItem(verticalSpacer_2);
+
+    pushButton_4 = new QPushButton(verticalLayoutWidget);
+    pushButton_4->setObjectName(QStringLiteral("pushButton_4"));
+    pushButton_4->setMinimumSize(QSize(0, 50));
+
+    verticalLayout->addWidget(pushButton_4);
+
+    verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayout->addItem(verticalSpacer_4);
+
+    pushButton_2 = new QPushButton(verticalLayoutWidget);
+    pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
+    pushButton_2->setMinimumSize(QSize(0, 50));
+
+    verticalLayout->addWidget(pushButton_2);
+
+    verticalSpacer_7 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayout->addItem(verticalSpacer_7);
+
+    pushButton_3 = new QPushButton(verticalLayoutWidget);
+    pushButton_3->setObjectName(QStringLiteral("pushButton_3"));
+    pushButton_3->setMinimumSize(QSize(0, 50));
+
+    verticalLayout->addWidget(pushButton_3);
+
+    verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayout->addItem(verticalSpacer_3);
+
+    gridLayoutWidget = new QWidget(this->centralWidget());
+    gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
+    gridLayoutWidget->setGeometry(QRect(970, 10, 941, 1011));
+    gridLayout = new QGridLayout(gridLayoutWidget);
+    gridLayout->setObjectName(QStringLiteral("gridLayout"));
+    gridLayout->setContentsMargins(0, 0, 0, 0);
+
+    qInfo() << "Here 2";
+
+    inner = new QGridLayout;
+
+    /*testing populating scroll area*/
+    for(int i = 0; i < 50; i++){
+        QPushButton *loop = new QPushButton();
+        loop->setMinimumHeight(250);
+        loop->setMinimumWidth(425);
+        loop->setMaximumHeight(250);
+        loop->setMaximumWidth(425);
+        inner->addWidget(loop, i/2, i%2, Qt::AlignRight);
     }
 
-    QWidget *central = new QWidget;
-    QVBoxLayout *layout = new QVBoxLayout(central);
-    //scroll->setWidget(central);
+    qInfo() << "Here 3";
 
+    //Create a widget and set its layout as your new layout created above
+    viewport = new QWidget;
+    viewport->setLayout(inner);
 
+    //Add the viewport to the scroll area
+    scrollArea = new QScrollArea;
+    scrollArea->setWidget(viewport);
 
-    //Set up layouts
-    newQuizLayout = new QVBoxLayout();
+    gridLayout->addWidget(scrollArea);
+    qInfo() << "Here 4";
 }
 
 void MainWindow::on_newQuizButton_clicked(){
     hideMenu();
     backButton->show();
+    initializeNewQuiz();
     showMakeQuizMenu();
 }
 
@@ -561,24 +628,29 @@ void MainWindow::showMakeQuizMenu(){
     //Hide main menu
     hideMenu();
     //Display the quiz editor menu
-    quizTitleText->show();
-    makeNewQuizButton->show();
-
-
-    //Reset the main layout to the divided screen version
+    verticalLayoutWidget->show();
+    textEdit->show();
+    pushButton->show();
+    pushButton_2->show();
+    pushButton_3->show();
+    pushButton_4->show();
+    viewport->show();
+    gridLayoutWidget->show();
 
 }
 
 void MainWindow::hideQuizMenu(){
     //Hide quiz menu widgets
-
+    quizWidget->hide();
+    verticalLayoutWidget->hide();
+    textEdit->hide();
+    pushButton->hide();
+    pushButton_2->hide();
+    pushButton_3->hide();
+    pushButton_4->hide();
+    gridLayoutWidget->hide();
     //Display the quiz editor menu
-    quizTitleText->hide();
-    makeNewQuizButton->hide();
     showMenu();
-
-    //Reset the old main layout
-
 }
 
 void MainWindow::showNewCard(){

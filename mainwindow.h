@@ -4,6 +4,7 @@
 #include "Card.h"
 #include "MyTextEdit.h"
 #include "QuizCard.h"
+#include "QuizEditor.h"
 #include <QMainWindow>
 #include <QtCore>
 #include <QLabel>
@@ -37,6 +38,7 @@ private:
 
     void initializeMenuButtons();
     void initializeBackButton();
+    void initializeQuizCreatorBackButton();
     void initializeNewCard();
     void initializeNewQuiz();
     void hideMenu();
@@ -48,6 +50,8 @@ private:
     void hideQuizMenu();
 
     Ui::MainWindow *ui;
+    QGridLayout *mainLayout;
+    QLabel* backGround;
 
     QVector<QPushButton*> buttonList;
     QVector<MyTextEdit*> newCardList;
@@ -82,12 +86,29 @@ private:
 
 
     //QObjects for new / Edit Quiz
-    MyTextEdit* quizTitleText;
-    QPushButton* makeNewQuizButton;
-    QVector<QVector<Card>> quizList;
-    QVBoxLayout* newQuizLayout;
-    QListWidget* userCards;
-    QScrollArea* cardArea;
+    QGridLayout *inner;
+    QWidget *viewport;
+    QScrollArea *scrollArea;
+
+    QWidget *quizWidget;
+    QWidget *verticalLayoutWidget;
+    QVBoxLayout *verticalLayout;
+    QSpacerItem *verticalSpacer_5;
+    QTextEdit *textEdit;
+    QSpacerItem *verticalSpacer_6;
+    QSpacerItem *verticalSpacer;
+    QPushButton *pushButton;
+    QSpacerItem *verticalSpacer_2;
+    QPushButton *pushButton_4;
+    QSpacerItem *verticalSpacer_4;
+    QPushButton *pushButton_2;
+    QSpacerItem *verticalSpacer_7;
+    QPushButton *pushButton_3;
+    QSpacerItem *verticalSpacer_3;
+    QWidget *gridLayoutWidget;
+    QGridLayout *gridLayout;
+    QMenuBar *menubar;
+    QStatusBar *statusbar;
 
     //Fonts
     QFont* titleFont = new QFont();

@@ -15,14 +15,18 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     Card.cpp \
     MyTextEdit.cpp \
-    QuizCard.cpp
+    QuizCard.cpp \
+    QuizEditor.cpp
 
 HEADERS  += mainwindow.h \
     Card.h \
     MyTextEdit.h \
-    QuizCard.h
+    QuizCard.h \
+    QuizEditor.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    QuizEditor.ui \
+    QuizEditor_copy.ui
 
 RESOURCES += \
     resources.qrc
