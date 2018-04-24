@@ -556,6 +556,11 @@ void MainWindow::initializeBackButton(){
     connect(backButton, SIGNAL (released()), this, SLOT (on_backButton_clicked()));
 }
 
+void MainWindow::initializeQuizCreatorBackButton(){
+    backButton->hide();
+    connect(backButton, SIGNAL (released()), this, SLOT (on_backButton_clicked()));
+}
+
 void MainWindow::initializeMenuButtons(){
     titleLabel = new QLabel();
     newCardButton = new QPushButton();
@@ -641,16 +646,14 @@ void MainWindow::showMakeQuizMenu(){
 
 void MainWindow::hideQuizMenu(){
     //Hide quiz menu widgets
-    quizWidget->hide();
-    verticalLayoutWidget->hide();
+    //quizWidget->hide();
+    //verticalLayoutWidget->hide();
     textEdit->hide();
     pushButton->hide();
     pushButton_2->hide();
     pushButton_3->hide();
     pushButton_4->hide();
     gridLayoutWidget->hide();
-    //Display the quiz editor menu
-    showMenu();
 }
 
 void MainWindow::showNewCard(){
@@ -676,8 +679,7 @@ void MainWindow::hideMenu(){
 
 void MainWindow::showMenu(){
     backButton->hide();
-    acceptNewCardButton->hide();
-    englishText->hide();
+    backGround->setPixmap(*pix1);
     titleLabel->show();
     newCardButton->show();
     newQuizButton->show();
