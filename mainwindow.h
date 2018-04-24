@@ -20,6 +20,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QScrollArea>
 #include <QListWidget>
+#include <QPainter>
 
 
 namespace Ui {
@@ -56,6 +57,7 @@ private:
     QVector<QPushButton*> buttonList;
     QVector<MyTextEdit*> newCardList;
     QVector<QPushButton*> pinButtonList;
+    QVector<Card*> userCards;
 
     //QObjects for main menu
     QLabel* titleLabel;
@@ -81,7 +83,7 @@ private:
     QPushButton* tone2Button;
     QPushButton* tone3Button;
     QPushButton* tone4Button;
-    QVector<Card> cardList;
+    QVector<Card> cardList = {Card("pls", "pls", "pls"), Card("pls", "pls", "pls")};
     QLabel* cardMadeLabel;
 
 
@@ -93,6 +95,7 @@ private:
     QWidget *quizWidget;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
+    QSpacerItem *horizontalSpacer_1;
     QSpacerItem *verticalSpacer_5;
     QTextEdit *textEdit;
     QSpacerItem *verticalSpacer_6;
@@ -112,6 +115,7 @@ private:
 
     //Fonts
     QFont* titleFont = new QFont();
+    QFont* buttonFont = new QFont();
     QFont* cardFont = new QFont();
     QFont* pinyinButtonFont = new QFont();
 
@@ -135,6 +139,8 @@ private slots:
     void on_tone3Button_clicked();
     void on_tone4Button_clicked();
     void on_hideNewCardMadeLabel();
+    void cardUpdater(Card newCard);
+    void cardLoader();
 };
 
 #endif // MAINWINDOW_H
