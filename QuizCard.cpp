@@ -1,23 +1,28 @@
 #include "QuizCard.h"
 
+QuizCard::QuizCard(){
+    card = new Card;
+    clicked = false;
+}
 
-QuizCard::QuizCard(QString english, QString pinyin, QString chinese){
-    englishText = english;
-    pinyinText = pinyin;
-    chineseText = chinese;
+QuizCard::QuizCard(Card cardIn){
+    this->card = new Card(cardIn);
     clicked = false;
 }
 
 void QuizCard::mouseReleaseEvent(QMouseEvent * event){
     if(event->button() == Qt::LeftButton && !clicked){
-        //this->setLineWidth(3);
-        //this->setMidLineWidth(3);
-        //this->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+        qInfo() << "PLSSSSSS";
+        QPalette palette = this->palette();
+        this->setStyleSheet("background-color: rgb(255, 0, 0);");
         clicked = true;
     }else if(event->button() == Qt::LeftButton && clicked){
-        //this->setLineWidth(0);
-        //this->setMidLineWidth(0);
-        //this->setFrameStyle(QFrame::Box | QFrame::Plain);
+        this->setStyleSheet("");
+        this->clearFocus();
         clicked = false;
     }
 };
+
+Card QuizCard::getCard() const{
+    return *card;
+}

@@ -5,6 +5,7 @@
 #include "MyTextEdit.h"
 #include "QuizCard.h"
 #include "QuizEditor.h"
+#include <DropDownTextEdit.h>
 #include <QMainWindow>
 #include <QtCore>
 #include <QLabel>
@@ -21,7 +22,7 @@
 #include <QScrollArea>
 #include <QListWidget>
 #include <QPainter>
-
+#include <QPair>
 
 namespace Ui {
 class MainWindow;
@@ -58,6 +59,8 @@ private:
     QVector<MyTextEdit*> newCardList;
     QVector<QPushButton*> pinButtonList;
     QVector<Card*> userCards;
+    QVector<QPair<QString, QVector<Card*>>> quizList;
+    QVector<QString> quizNameTest= {"Chapter 1", "Chapter 2"};
 
     //QObjects for main menu
     QLabel* titleLabel;
@@ -83,7 +86,7 @@ private:
     QPushButton* tone2Button;
     QPushButton* tone3Button;
     QPushButton* tone4Button;
-    QVector<Card> cardList = {Card("pls", "pls", "pls"), Card("pls", "pls", "pls")};
+    QVector<Card> cardList;
     QLabel* cardMadeLabel;
 
 
@@ -97,7 +100,7 @@ private:
     QVBoxLayout *verticalLayout;
     QSpacerItem *horizontalSpacer_1;
     QSpacerItem *verticalSpacer_5;
-    QTextEdit *textEdit;
+    DropDownTextEdit *textEdit;
     QSpacerItem *verticalSpacer_6;
     QSpacerItem *verticalSpacer;
     QPushButton *pushButton;
@@ -118,6 +121,7 @@ private:
     QFont* buttonFont = new QFont();
     QFont* cardFont = new QFont();
     QFont* pinyinButtonFont = new QFont();
+    QFont* textEditFont = new QFont();
 
 
     //Default widget heights/ widths

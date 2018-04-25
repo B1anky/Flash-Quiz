@@ -9,11 +9,10 @@ class MyTextEdit : public QTextEdit {
     Q_OBJECT
     Q_DECLARE_PRIVATE(QTextEdit)
 public:
-    Q_DECLARE_FLAGS(AutoFormatting, AutoFormattingFlag)
     explicit MyTextEdit(QTextEdit *parent = nullptr);
     void setDefaultText(QString str);
     QString getDefaultText();
-private:
+protected:
     QString defaultText;
     void focusInEvent(QFocusEvent * event);
     void focusOutEvent(QFocusEvent* event);

@@ -12,14 +12,32 @@ Card::Card(QString english, QString pinyin, QString chinese){
     chineseText = new QString(chinese);
 }
 
-QString Card::getEnglish(){
+Card::Card(const Card& cardIn){
+    englishText = new QString(cardIn.getEnglish());
+    pinyinText = new QString(cardIn.getPinyin());
+    chineseText = new QString(cardIn.getChinese());
+}
+
+QString Card::getEnglish() const{
     return *englishText;
 }
 
-QString Card::getPinyin(){
+QString Card::getPinyin() const{
     return *pinyinText;
 }
 
-QString Card::getChinese(){
+QString Card::getChinese() const{
     return *chineseText;
+}
+
+void Card::setEnglish(QString english){
+    englishText = new QString(english);
+}
+
+void Card::setPinyin(QString pinyin){
+    pinyinText = new QString(pinyin);
+}
+
+void Card::setChinese(QString chinese){
+    chineseText = new QString(chinese);
 }

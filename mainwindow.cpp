@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     initializeBackButton();
     initializeNewCard();
     cardFont->setPointSize(100);
+    textEditFont->setPointSize(25);
     initializeNewQuiz();
     hideQuizMenu();
     // don't init until button clicked initializeNewQuiz();
@@ -347,7 +348,6 @@ void MainWindow::on_backButton_clicked(){
 
 
 void MainWindow::initializeNewQuiz(){
-    qInfo() << "Here 1";
     backGround->setPixmap(*new QPixmap());
     verticalLayoutWidget = new QWidget(this->centralWidget());
     verticalLayoutWidget->setObjectName(QStringLiteral("verticalLayoutWidget"));
@@ -360,8 +360,8 @@ void MainWindow::initializeNewQuiz(){
 
     verticalLayout->addItem(verticalSpacer_5);
 
-    textEdit = new QTextEdit(verticalLayoutWidget);
-    textEdit->setObjectName(QStringLiteral("textEdit"));
+    textEdit = new DropDownTextEdit(quizNameTest);
+
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     sizePolicy.setHorizontalStretch(0);
     sizePolicy.setVerticalStretch(0);
@@ -369,6 +369,9 @@ void MainWindow::initializeNewQuiz(){
     textEdit->setSizePolicy(sizePolicy);
     textEdit->setMinimumSize(QSize(0, 50));
     textEdit->setMaximumSize(QSize(16777215, 50));
+    textEdit->setDefaultText("Insert quiz name here");
+    textEdit->setText(textEdit->getDefaultText());
+    textEdit->setFont(*textEditFont);
 
     verticalLayout->addWidget(textEdit);
 
@@ -427,14 +430,12 @@ void MainWindow::initializeNewQuiz(){
     gridLayout->setObjectName(QStringLiteral("gridLayout"));
     gridLayout->setContentsMargins(0, 0, 0, 0);
 
-    qInfo() << "Here 2";
 
     inner = new QGridLayout;
 
     //Loads cards
     cardLoader();
 
-    qInfo() << "Here 3";
 
     //Create a widget and set its layout as your new layout created above
     viewport = new QWidget;
@@ -445,11 +446,10 @@ void MainWindow::initializeNewQuiz(){
     scrollArea->setWidget(viewport);
 
     gridLayout->addWidget(scrollArea);
-    qInfo() << "Here 4";
 }
 
 void MainWindow::cardUpdater(Card newCard){
-    QPushButton *quizCard = new QPushButton();
+    QuizCard *quizCard = new QuizCard(newCard);
     quizCard->setMinimumHeight(250);
     quizCard->setMinimumWidth(425);
     quizCard->setMaximumHeight(250);
@@ -457,9 +457,9 @@ void MainWindow::cardUpdater(Card newCard){
     QPixmap *cardImg = new QPixmap(*pix1);
     QPainter painter(cardImg);
     painter.setFont(*cardFont);
-    painter.drawText(QPoint(200, 285), newCard.getEnglish());
-    painter.drawText(QPoint(200, 540), newCard.getPinyin());
-    painter.drawText(QPoint(200, 800), newCard.getChinese());
+    painter.drawText(QPoint(200, 285), quizCard->getCard().getEnglish());
+    painter.drawText(QPoint(200, 540), quizCard->getCard().getPinyin());
+    painter.drawText(QPoint(200, 800), quizCard->getCard().getChinese());
     QIcon ButtonIcon(*cardImg);
     quizCard->setIcon(ButtonIcon);
     quizCard->setIconSize(QSize(380, 315));
@@ -469,7 +469,7 @@ void MainWindow::cardUpdater(Card newCard){
 void MainWindow::cardLoader(){
     /*testing populating scroll area*/
     for(int i = 0; i < cardList.size(); i++){
-        QPushButton *quizCard = new QPushButton();
+        QuizCard *quizCard = new QuizCard(cardList[i]);
         quizCard->setMinimumHeight(250);
         quizCard->setMinimumWidth(425);
         quizCard->setMaximumHeight(250);
@@ -477,9 +477,9 @@ void MainWindow::cardLoader(){
         QPixmap *cardImg = new QPixmap(*pix1);
         QPainter painter(cardImg);
         painter.setFont(*cardFont);
-        painter.drawText(QPoint(200, 285), cardList[i].getEnglish());
-        painter.drawText(QPoint(200, 540), cardList[i].getPinyin());
-        painter.drawText(QPoint(200, 800), cardList[i].getChinese());
+        painter.drawText(QPoint(200, 285), quizCard->getCard().getEnglish());
+        painter.drawText(QPoint(200, 540), quizCard->getCard().getPinyin());
+        painter.drawText(QPoint(200, 800), quizCard->getCard().getChinese());
         QIcon ButtonIcon(*cardImg);
         quizCard->setIcon(ButtonIcon);
         quizCard->setIconSize(QSize(380, 315));
@@ -535,7 +535,7 @@ void MainWindow::initializeNewCard(){
     cardMadeLabel->setText("Card was successfully created!");
     cardMadeLabel->setFont(*titleFont);
     cardMadeLabel->setMinimumWidth(this->width());
-    cardMadeLabel->setMinimumHeight(buttonHeight);
+    cardMadeLabel->setMaximumHeight(buttonHeight + 25);
     cardMadeLabel->setStyleSheet("background-color: rgba(255, 255, 255, 100);");
     cardMadeLabel->move(this->width()/2 - cardMadeLabel->width()/2 + 25, this->height()/2  - cardMadeLabel->height()/2 - 235);
     cardMadeLabel->setParent(this);

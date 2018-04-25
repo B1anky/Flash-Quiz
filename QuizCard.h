@@ -4,15 +4,18 @@
 #include <QApplication>
 #include <QMouseEvent>
 #include <QString>
-#include <QListWidgetItem>
+#include <QPushButton>
+#include <card.h>
+#include <QPalette>
+#include <QtGlobal>
 
-class QuizCard : public QListWidgetItem {
+class QuizCard : public QPushButton {
 public:
-    QuizCard(QString english, QString pinyin, QString chinese);
+    QuizCard();
+    QuizCard(Card cardIn);
+    Card getCard() const;
 private:
-    QString englishText;
-    QString pinyinText;
-    QString chineseText;
+    Card* card;
     bool clicked;
     void mouseReleaseEvent(QMouseEvent * event);
 signals:

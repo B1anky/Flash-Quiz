@@ -16,13 +16,15 @@ SOURCES += main.cpp\
     Card.cpp \
     MyTextEdit.cpp \
     QuizCard.cpp \
-    QuizEditor.cpp
+    QuizEditor.cpp \
+    DropDownTextEdit.cpp
 
 HEADERS  += mainwindow.h \
     Card.h \
     MyTextEdit.h \
     QuizCard.h \
-    QuizEditor.h
+    QuizEditor.h \
+    DropDownTextEdit.h
 
 FORMS    += mainwindow.ui \
     QuizEditor.ui \
