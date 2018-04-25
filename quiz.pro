@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-10-30T10:44:40
+# Project created by QtCreator 2017-10-30T10:44:41
 #
 #-------------------------------------------------
 
@@ -17,14 +17,16 @@ SOURCES += main.cpp\
     MyTextEdit.cpp \
     QuizCard.cpp \
     QuizEditor.cpp \
-    DropDownTextEdit.cpp
+    DropDownTextEdit.cpp \
+    HoverButton.cpp
 
 HEADERS  += mainwindow.h \
     Card.h \
     MyTextEdit.h \
     QuizCard.h \
     QuizEditor.h \
-    DropDownTextEdit.h
+    DropDownTextEdit.h \
+    HoverButton.h
 
 FORMS    += mainwindow.ui \
     QuizEditor.ui \

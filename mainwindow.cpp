@@ -334,12 +334,7 @@ void MainWindow::on_lightningQuizButton_clicked(){
 void MainWindow::on_statisticsButton_clicked(){
 
 }
-/*
-void MainWindow::on_QuizEdit_backButton_clicked(){
-    hideQuizMenu();
-    showMenu();
-}
-*/
+
 void MainWindow::on_backButton_clicked(){
     hideNewCard();
     hideQuizMenu();
@@ -355,25 +350,28 @@ void MainWindow::initializeNewQuiz(){
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
     verticalLayout->setContentsMargins(0, 0, 0, 0);
+    verticalSpacer_9 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalLayout->addItem(verticalSpacer_9);
 
+    verticalLayout->addWidget(backButton);
 
     verticalLayout->addItem(verticalSpacer_5);
 
-    textEdit = new DropDownTextEdit(quizNameTest);
+    quizTextEdit = new DropDownTextEdit(quizNameTest);
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     sizePolicy.setHorizontalStretch(0);
     sizePolicy.setVerticalStretch(0);
-    sizePolicy.setHeightForWidth(textEdit->sizePolicy().hasHeightForWidth());
-    textEdit->setSizePolicy(sizePolicy);
-    textEdit->setMinimumSize(QSize(0, 50));
-    textEdit->setMaximumSize(QSize(16777215, 50));
-    textEdit->setDefaultText("Insert quiz name here");
-    textEdit->setText(textEdit->getDefaultText());
-    textEdit->setFont(*textEditFont);
+    sizePolicy.setHeightForWidth(quizTextEdit->sizePolicy().hasHeightForWidth());
+    quizTextEdit->setSizePolicy(sizePolicy);
+    quizTextEdit->setMinimumSize(QSize(0, 50));
+    quizTextEdit->setMaximumSize(QSize(16777215, 50));
+    quizTextEdit->setDefaultText("Insert quiz name here");
+    quizTextEdit->setText(quizTextEdit->getDefaultText());
+    quizTextEdit->setFont(*textEditFont);
 
-    verticalLayout->addWidget(textEdit);
+    verticalLayout->addWidget(quizTextEdit);
 
     verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -383,45 +381,56 @@ void MainWindow::initializeNewQuiz(){
 
     verticalLayout->addItem(verticalSpacer);
 
-    pushButton = new QPushButton(verticalLayoutWidget);
-    pushButton->setObjectName(QStringLiteral("pushButton"));
-    pushButton->setMinimumSize(QSize(0, 50));
-
-    verticalLayout->addWidget(pushButton);
+    createEditQuizButton = new HoverButton();
+    createEditQuizButton->setMinimumSize(QSize(0, 50));
+    createEditQuizButton->setText("Create/Edit Quiz");
+    createEditQuizButton->setFont(*buttonFont);
+    verticalLayout->addWidget(createEditQuizButton);
 
     verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     verticalLayout->addItem(verticalSpacer_2);
 
-    pushButton_4 = new QPushButton(verticalLayoutWidget);
-    pushButton_4->setObjectName(QStringLiteral("pushButton_4"));
-    pushButton_4->setMinimumSize(QSize(0, 50));
-
-    verticalLayout->addWidget(pushButton_4);
+    saveQuizButton = new HoverButton();
+    saveQuizButton->setText("Save Quiz");
+    saveQuizButton->setMinimumSize(QSize(0, 50));
+    saveQuizButton->setFont(*buttonFont);
+    verticalLayout->addWidget(saveQuizButton);
 
     verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     verticalLayout->addItem(verticalSpacer_4);
 
-    pushButton_2 = new QPushButton(verticalLayoutWidget);
-    pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
-    pushButton_2->setMinimumSize(QSize(0, 50));
-
-    verticalLayout->addWidget(pushButton_2);
+    loadQuizButton = new HoverButton();
+    loadQuizButton->setText("Load Quiz");
+    loadQuizButton->setMinimumSize(QSize(0, 50));
+    loadQuizButton->setFont(*buttonFont);
+    verticalLayout->addWidget(loadQuizButton);
 
     verticalSpacer_7 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     verticalLayout->addItem(verticalSpacer_7);
 
-    pushButton_3 = new QPushButton(verticalLayoutWidget);
-    pushButton_3->setObjectName(QStringLiteral("pushButton_3"));
-    pushButton_3->setMinimumSize(QSize(0, 50));
-
-    verticalLayout->addWidget(pushButton_3);
+    deleteQuizButton = new HoverButton();
+    deleteQuizButton->setText("Delete Quiz");
+    deleteQuizButton->setMinimumSize(QSize(0, 50));
+    deleteQuizButton->setFont(*buttonFont);
+    verticalLayout->addWidget(deleteQuizButton);
 
     verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     verticalLayout->addItem(verticalSpacer_3);
+
+    deleteSelectedCardsButton = new HoverButton();
+    deleteSelectedCardsButton->setText("Delete selected cards");
+    deleteSelectedCardsButton->setMinimumSize(QSize(0, 50));
+    deleteSelectedCardsButton->setFont(*buttonFont);
+    verticalLayout->addWidget(deleteSelectedCardsButton);
+
+    verticalSpacer_8 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+    verticalLayout->addItem(verticalSpacer_8);
+
 
     gridLayoutWidget = new QWidget(this->centralWidget());
     gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
@@ -520,7 +529,7 @@ void MainWindow::initializeNewCard(){
         curY += buttonHeight * 2 + 30;
     }
 
-    acceptNewCardButton = new QPushButton;
+    acceptNewCardButton = new HoverButton;
 
     acceptNewCardButton->setFixedWidth(buttonWidth);
     acceptNewCardButton->setFixedHeight(buttonHeight);
@@ -542,11 +551,11 @@ void MainWindow::initializeNewCard(){
     cardMadeLabel->setAlignment(Qt::AlignCenter);
     cardMadeLabel->hide();
 
-    tone0Button = new QPushButton;
-    tone1Button = new QPushButton;
-    tone2Button = new QPushButton;
-    tone3Button = new QPushButton;
-    tone4Button = new QPushButton;
+    tone0Button = new HoverButton;
+    tone1Button = new HoverButton;
+    tone2Button = new HoverButton;
+    tone3Button = new HoverButton;
+    tone4Button = new HoverButton;
 
     pinButtonList = {tone0Button, tone1Button, tone2Button, tone3Button, tone4Button};
 
@@ -578,7 +587,7 @@ void MainWindow::initializeNewCard(){
 }
 
 void MainWindow::initializeBackButton(){
-    backButton = new QPushButton();
+    backButton = new HoverButton();
     backButton->setFixedWidth(buttonWidth);
     backButton->setFixedHeight(buttonHeight);
     backButton->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
@@ -592,12 +601,12 @@ void MainWindow::initializeBackButton(){
 
 void MainWindow::initializeMenuButtons(){
     titleLabel = new QLabel();
-    newCardButton = new QPushButton();
-    newQuizButton = new QPushButton();
-    quizSelectButton = new QPushButton();
-    randomAllButton = new QPushButton();
-    lightningQuizButton = new QPushButton();
-    statisticsButton = new QPushButton();
+    newCardButton = new HoverButton();
+    newQuizButton = new HoverButton();
+    quizSelectButton = new HoverButton();
+    randomAllButton = new HoverButton();
+    lightningQuizButton = new HoverButton();
+    statisticsButton = new HoverButton();
 
     buttonList = {newCardButton, newQuizButton, quizSelectButton, randomAllButton, lightningQuizButton, statisticsButton};
 
@@ -623,6 +632,7 @@ void MainWindow::initializeMenuButtons(){
     titleLabel->setParent(this);
 
     for(auto button: buttonList){
+        button->setAttribute(Qt::WA_Hover, true);
         button->setFixedWidth(buttonWidth);
         button->setFixedHeight(buttonHeight);
         button->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
@@ -663,11 +673,11 @@ void MainWindow::showMakeQuizMenu(){
     hideMenu();
     //Display the quiz editor menu
     verticalLayoutWidget->show();
-    textEdit->show();
-    pushButton->show();
-    pushButton_2->show();
-    pushButton_3->show();
-    pushButton_4->show();
+    quizTextEdit->show();
+    createEditQuizButton->show();
+    saveQuizButton->show();
+    loadQuizButton->show();
+    deleteQuizButton->show();
     viewport->show();
     gridLayoutWidget->show();
 
@@ -675,14 +685,15 @@ void MainWindow::showMakeQuizMenu(){
 
 void MainWindow::hideQuizMenu(){
     //Hide quiz menu widgets
-    //quizWidget->hide();
-    //verticalLayoutWidget->hide();
-    textEdit->hide();
-    pushButton->hide();
-    pushButton_2->hide();
-    pushButton_3->hide();
-    pushButton_4->hide();
+    quizTextEdit->hide();
+    createEditQuizButton->hide();
+    saveQuizButton->hide();
+    loadQuizButton->hide();
+    deleteQuizButton->hide();
+    deleteSelectedCardsButton->hide();
     gridLayoutWidget->hide();
+    verticalLayout->removeWidget(backButton);
+    initializeBackButton();
 }
 
 void MainWindow::showNewCard(){
@@ -714,4 +725,25 @@ void MainWindow::showMenu(){
     randomAllButton->show();
     lightningQuizButton->show();
     statisticsButton->show();
+}
+
+//create a new quiz based on quizTextEdit's content
+void MainWindow::createEditQuizButton_clicked(){
+
+}
+
+void MainWindow::saveQuizButton_clicked(){
+
+}
+
+void MainWindow::loadQuizButton_clicked(){
+
+}
+
+void MainWindow::deleteQuizButton_clicked(){
+
+}
+
+void MainWindow::deleteSelectedCardsButton_clicked(){
+
 }

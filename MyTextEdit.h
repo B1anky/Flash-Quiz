@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QTextEdit>
 #include <QString>
+#include <QKeyEvent>
 
 class MyTextEdit : public QTextEdit {
     Q_OBJECT
@@ -16,6 +17,7 @@ protected:
     QString defaultText;
     void focusInEvent(QFocusEvent * event);
     void focusOutEvent(QFocusEvent* event);
+    void keyPressEvent(QKeyEvent *e);
 signals:
 
 public slots:

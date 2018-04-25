@@ -16,7 +16,16 @@ void MyTextEdit::focusInEvent(QFocusEvent * event){
     if(this->toPlainText() == defaultText){
         this->setText("");
     }
+
      QTextEdit::focusInEvent(event);
+}
+
+void MyTextEdit::keyPressEvent(QKeyEvent *e){
+    if (e->key() == Qt::Key_Return)
+        return;
+    else{
+        QTextEdit::keyPressEvent(e);
+    }
 }
 
 void MyTextEdit::focusOutEvent(QFocusEvent* event){

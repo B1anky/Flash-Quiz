@@ -5,12 +5,12 @@
 #include "MyTextEdit.h"
 #include "QuizCard.h"
 #include "QuizEditor.h"
+#include "HoverButton.h"
 #include <DropDownTextEdit.h>
 #include <QMainWindow>
 #include <QtCore>
 #include <QLabel>
 #include <QHBoxLayout>
-#include <QPushButton>
 #include <QVector>
 #include <QFont>
 #include <fstream>
@@ -55,37 +55,37 @@ private:
     QGridLayout *mainLayout;
     QLabel* backGround;
 
-    QVector<QPushButton*> buttonList;
+    QVector<HoverButton*> buttonList;
     QVector<MyTextEdit*> newCardList;
-    QVector<QPushButton*> pinButtonList;
+    QVector<HoverButton*> pinButtonList;
     QVector<Card*> userCards;
     QVector<QPair<QString, QVector<Card*>>> quizList;
     QVector<QString> quizNameTest= {"Chapter 1", "Chapter 2"};
 
     //QObjects for main menu
     QLabel* titleLabel;
-    QPushButton* newCardButton;
-    QPushButton* newQuizButton;
-    QPushButton* quizSelectButton;
-    QPushButton* randomAllButton;
-    QPushButton* lightningQuizButton;
-    QPushButton* statisticsButton;
+    HoverButton* newCardButton;
+    HoverButton* newQuizButton;
+    HoverButton* quizSelectButton;
+    HoverButton* randomAllButton;
+    HoverButton* lightningQuizButton;
+    HoverButton* statisticsButton;
     QPixmap* pix1;
     QHBoxLayout *backGroundLayout;
 
     //QObject for every screen's back button
-    QPushButton* backButton;
+    HoverButton* backButton;
 
     //QObjects for new card menu
     MyTextEdit* englishText;
     MyTextEdit* pinyinText;
     MyTextEdit* chineseText;
-    QPushButton* acceptNewCardButton;
-    QPushButton* tone0Button;
-    QPushButton* tone1Button;
-    QPushButton* tone2Button;
-    QPushButton* tone3Button;
-    QPushButton* tone4Button;
+    HoverButton* acceptNewCardButton;
+    HoverButton* tone0Button;
+    HoverButton* tone1Button;
+    HoverButton* tone2Button;
+    HoverButton* tone3Button;
+    HoverButton* tone4Button;
     QVector<Card> cardList;
     QLabel* cardMadeLabel;
 
@@ -100,17 +100,20 @@ private:
     QVBoxLayout *verticalLayout;
     QSpacerItem *horizontalSpacer_1;
     QSpacerItem *verticalSpacer_5;
-    DropDownTextEdit *textEdit;
+    DropDownTextEdit *quizTextEdit;
     QSpacerItem *verticalSpacer_6;
     QSpacerItem *verticalSpacer;
-    QPushButton *pushButton;
+    HoverButton *createEditQuizButton;
     QSpacerItem *verticalSpacer_2;
-    QPushButton *pushButton_4;
+    HoverButton *saveQuizButton;
     QSpacerItem *verticalSpacer_4;
-    QPushButton *pushButton_2;
+    HoverButton *loadQuizButton;
     QSpacerItem *verticalSpacer_7;
-    QPushButton *pushButton_3;
+    HoverButton *deleteQuizButton;
     QSpacerItem *verticalSpacer_3;
+    HoverButton *deleteSelectedCardsButton;
+    QSpacerItem *verticalSpacer_8;
+    QSpacerItem *verticalSpacer_9;
     QWidget *gridLayoutWidget;
     QGridLayout *gridLayout;
     QMenuBar *menubar;
@@ -135,7 +138,9 @@ private slots:
     void on_randomAllButton_clicked();
     void on_lightningQuizButton_clicked();
     void on_statisticsButton_clicked();
+
     void on_backButton_clicked();
+
     void on_acceptNewCardButton_clicked();
     void on_tone0Button_clicked();
     void on_tone1Button_clicked();
@@ -143,8 +148,14 @@ private slots:
     void on_tone3Button_clicked();
     void on_tone4Button_clicked();
     void on_hideNewCardMadeLabel();
+
     void cardUpdater(Card newCard);
     void cardLoader();
+    void createEditQuizButton_clicked();
+    void saveQuizButton_clicked();
+    void loadQuizButton_clicked();
+    void deleteQuizButton_clicked();
+    void deleteSelectedCardsButton_clicked();
 };
 
 #endif // MAINWINDOW_H
