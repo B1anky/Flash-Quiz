@@ -1,14 +1,7 @@
 #include "DropDownTextEdit.h"
 
-DropDownTextEdit::DropDownTextEdit(QVector<QString> quizNamesIn){
-    for(auto quiz: quizNamesIn){
-        quizNames << quiz;
-    }
-
-    stringCompleter = new QCompleter(quizNames, this);
-    stringCompleter->setFilterMode(Qt::MatchContains);
-    stringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    this->setCompleter(stringCompleter);
+DropDownTextEdit::DropDownTextEdit(QVector<QPair<QString, QVector<Card*>>> quizListIn){
+    updateCompleter(quizListIn);
 }
 
 void DropDownTextEdit::setDefaultText(QString str){
@@ -27,4 +20,37 @@ void DropDownTextEdit::focusInEvent(QFocusEvent *e){
     QLineEdit::focusInEvent(e);
 }
 
+void DropDownTextEdit::focusOutEvent(QFocusEvent *e){
+    if(this->text() == ""){
+        this->setText(defaultText);
+    }
+
+    QLineEdit::focusInEvent(e);
+}
+
+void DropDownTextEdit::updateCompleter(QVector<QPair<QString, QVector<Card*>>> quizListIn){
+    if(quizListIn.empty()){
+        this->setCompleter(nullptr);
+        return;
+    }
+
+    for(auto quiz: quizListIn){
+        qInfo() << quiz.first;
+        quizNames << quiz.first;
+    }
+
+    QCompleter* stringCompleter = new QCompleter(quizNames, this);
+    stringCompleter->setFilterMode(Qt::MatchContains);
+    stringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+
+    if(stringCompleter){
+        this->disconnect(stringCompleter);
+    }
+
+    if(!stringCompleter){
+        return;
+    }
+
+    this->setCompleter(stringCompleter);
+}
 

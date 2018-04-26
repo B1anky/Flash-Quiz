@@ -12,8 +12,10 @@
 class QuizCard : public QPushButton {
 public:
     QuizCard();
-    QuizCard(Card cardIn);
+    QuizCard(Card cardIn, QVector<Card*>& selectedCards);
+    QVector<Card*>* selected;
     Card getCard() const;
+    Card* getCardRef() const;
 private:
     Card* card;
     bool clicked;

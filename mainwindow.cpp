@@ -24,7 +24,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     textEditFont->setPointSize(25);
     initializeNewQuiz();
     hideQuizMenu();
-    // don't init until button clicked initializeNewQuiz();
     showMenu();
 
 
@@ -283,9 +282,8 @@ void MainWindow::on_acceptNewCardButton_clicked(){
     }
 
     if(cardMade){
-        Card newCard(englishText->toPlainText(), pinyinText->toPlainText(), chineseText->toPlainText());
-        cardList.push_back(newCard);
-        cardUpdater(newCard);
+        Card* newCard = new Card(englishText->toPlainText(), pinyinText->toPlainText(), chineseText->toPlainText());
+        cardUpdater(*newCard);
         //Fade in label
         QGraphicsOpacityEffect *fadeInEff = new QGraphicsOpacityEffect(this);
         cardMadeLabel->setGraphicsEffect(fadeInEff);
@@ -354,11 +352,11 @@ void MainWindow::initializeNewQuiz(){
     verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     verticalLayout->addItem(verticalSpacer_9);
 
-    verticalLayout->addWidget(backButton);
+    //verticalLayout->addWidget(backButton);
 
     verticalLayout->addItem(verticalSpacer_5);
 
-    quizTextEdit = new DropDownTextEdit(quizNameTest);
+    quizTextEdit = new DropDownTextEdit(quizList);
 
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     sizePolicy.setHorizontalStretch(0);
@@ -442,10 +440,6 @@ void MainWindow::initializeNewQuiz(){
 
     inner = new QGridLayout;
 
-    //Loads cards
-    cardLoader();
-
-
     //Create a widget and set its layout as your new layout created above
     viewport = new QWidget;
     viewport->setLayout(inner);
@@ -455,10 +449,17 @@ void MainWindow::initializeNewQuiz(){
     scrollArea->setWidget(viewport);
 
     gridLayout->addWidget(scrollArea);
+
+    //Connect signals and slots for buttons
+    connect(createEditQuizButton, SIGNAL (released()), this, SLOT (createEditQuizButton_clicked()));
+    connect(saveQuizButton, SIGNAL (released()), this, SLOT (saveQuizButton_clicked()));
+    connect(loadQuizButton, SIGNAL (released()), this, SLOT (loadQuizButton_clicked()));
+    connect(deleteQuizButton, SIGNAL (released()), this, SLOT (deleteQuizButton_clicked()));
+    connect(deleteSelectedCardsButton, SIGNAL (released()), this, SLOT (deleteSelectedCardsButton_clicked()));
 }
 
 void MainWindow::cardUpdater(Card newCard){
-    QuizCard *quizCard = new QuizCard(newCard);
+    QuizCard *quizCard = new QuizCard(newCard, selectedCards);
     quizCard->setMinimumHeight(250);
     quizCard->setMinimumWidth(425);
     quizCard->setMaximumHeight(250);
@@ -472,13 +473,15 @@ void MainWindow::cardUpdater(Card newCard){
     QIcon ButtonIcon(*cardImg);
     quizCard->setIcon(ButtonIcon);
     quizCard->setIconSize(QSize(380, 315));
-    inner->addWidget(quizCard, cardList.size() / 2, cardList.size() % 2, Qt::AlignRight);
+    userCards.push_back(quizCard->getCardRef());
+    physicalCardButtonList.push_back(quizCard);
+    inner->addWidget(quizCard, (userCards.size() - 1) / 2, (userCards.size() - 1) % 2, Qt::AlignRight);
 }
 
 void MainWindow::cardLoader(){
     /*testing populating scroll area*/
-    for(int i = 0; i < cardList.size(); i++){
-        QuizCard *quizCard = new QuizCard(cardList[i]);
+    for(int i = 0; i < userCards.size(); i++){
+        QuizCard *quizCard = new QuizCard(*userCards[i], selectedCards);
         quizCard->setMinimumHeight(250);
         quizCard->setMinimumWidth(425);
         quizCard->setMaximumHeight(250);
@@ -492,14 +495,21 @@ void MainWindow::cardLoader(){
         QIcon ButtonIcon(*cardImg);
         quizCard->setIcon(ButtonIcon);
         quizCard->setIconSize(QSize(380, 315));
+        userCards.push_back(quizCard->getCardRef());
+        physicalCardButtonList.push_back(quizCard);
         inner->addWidget(quizCard, i/2, i%2, Qt::AlignRight);
     }
 }
 
+void MainWindow::cardDisplayer(){
+    for(int i = 0; i < physicalCardButtonList.size(); i++){
+        qInfo() << i;
+        inner->addWidget(physicalCardButtonList[i], i/2, i%2, Qt::AlignRight);
+    }
+}
+
 void MainWindow::on_newQuizButton_clicked(){
-    hideMenu();
     backButton->show();
-    initializeNewQuiz();
     showMakeQuizMenu();
 }
 
@@ -671,6 +681,25 @@ void MainWindow::hideNewCard(){
 void MainWindow::showMakeQuizMenu(){
     //Hide main menu
     hideMenu();
+
+    //Reset default background
+    backGround->setPixmap(*new QPixmap());
+
+    //add back button
+    //verticalLayout->addWidget(backButton);
+    backButton->show();
+
+    viewport = new QWidget;
+    viewport->setLayout(inner);
+
+    gridLayout->removeWidget(scrollArea);
+
+    //Add the viewport to the scroll area
+    scrollArea = new QScrollArea;
+    scrollArea->setWidget(viewport);
+
+    gridLayout->addWidget(scrollArea);
+
     //Display the quiz editor menu
     verticalLayoutWidget->show();
     quizTextEdit->show();
@@ -678,6 +707,7 @@ void MainWindow::showMakeQuizMenu(){
     saveQuizButton->show();
     loadQuizButton->show();
     deleteQuizButton->show();
+    deleteSelectedCardsButton->show();
     viewport->show();
     gridLayoutWidget->show();
 
@@ -729,21 +759,87 @@ void MainWindow::showMenu(){
 
 //create a new quiz based on quizTextEdit's content
 void MainWindow::createEditQuizButton_clicked(){
+    //Search the quizList for the string pair name that corresponds to quizTextEdit's text
+    //If there's a match, then we're updating/adding to a current quiz, otherwise we're appending a new quiz
+    for(auto quiz: quizList){
+        if(quiz.first == quizTextEdit->text()){
+            quiz.second = selectedCards;
+            break;
+        }
+    }
 
+    //otherwise need to append a new list to quizList
+    quizList.push_back(QPair<QString, QVector<Card*>>(quizTextEdit->text(), selectedCards));
+
+    //update the completer
+    quizTextEdit->updateCompleter(quizList);
 }
 
+//This writes to the text file the quiz cards and quizzes
 void MainWindow::saveQuizButton_clicked(){
-
+    for(auto quiz: quizList){
+        qInfo() << quiz.first;
+        for(auto card : quiz.second){
+            qInfo() << *card;
+        }
+    }
 }
 
+//This reads a save file and loads into quizList and userCards
 void MainWindow::loadQuizButton_clicked(){
 
 }
 
+//Clears quizList
 void MainWindow::deleteQuizButton_clicked(){
+    //Remove corresponding quizTextEdit's match from quizList
+    for(int i = 0; i < quizList.size(); i++){
+        if(quizList[i].first == quizTextEdit->text()){
+            quizList.remove(i);
+            qInfo() << "deleting quiz";
+            break;
+        }
+    }
 
+    //update the completer
+    quizTextEdit->updateCompleter(quizList);
 }
 
 void MainWindow::deleteSelectedCardsButton_clicked(){
+    //O(n^2) solution maybe make better in the future
+    //for every card in selectedCards, remove from userCards
+    qInfo() << "Calling delete";
+    for(auto toDelete : selectedCards){
+        int i = 0;
+        selectedCards.removeOne(toDelete);
+        //search through userCards for match and remove element in userCards
+        for(auto userCard : userCards){
+            if(userCard == toDelete){
+                qInfo() << "Removing card";
+                userCards.removeOne(userCard);
+                inner->removeWidget(physicalCardButtonList[i]);
+                physicalCardButtonList.removeAt(i);
+            }
+            i++;
+        }
+    }
+
+
+    //Create a widget and set its layout as your new layout created above
+    gridLayout->removeWidget(scrollArea);
+    //viewport->setLayout(nullptr);
+    //gridLayout->setContentsMargins(0, 0, 0, 0);
+
+    viewport = new QWidget;
+    viewport->setLayout(inner);
+
+    //Add the viewport to the scroll area
+    scrollArea = new QScrollArea;
+    scrollArea->setWidget(viewport);
+
+    gridLayout->addWidget(scrollArea);
+
+    //create a new visualizer
+    cardDisplayer();
 
 }

@@ -50,6 +50,7 @@ private:
     void applyTone(int toneNum);
     void showMakeQuizMenu();
     void hideQuizMenu();
+    void cardDisplayer();
 
     Ui::MainWindow *ui;
     QGridLayout *mainLayout;
@@ -59,8 +60,9 @@ private:
     QVector<MyTextEdit*> newCardList;
     QVector<HoverButton*> pinButtonList;
     QVector<Card*> userCards;
+    QVector<Card*> selectedCards;
     QVector<QPair<QString, QVector<Card*>>> quizList;
-    QVector<QString> quizNameTest= {"Chapter 1", "Chapter 2"};
+    QVector<QuizCard*> physicalCardButtonList;
 
     //QObjects for main menu
     QLabel* titleLabel;
@@ -86,7 +88,7 @@ private:
     HoverButton* tone2Button;
     HoverButton* tone3Button;
     HoverButton* tone4Button;
-    QVector<Card> cardList;
+    //QVector<Card> cardList;
     QLabel* cardMadeLabel;
 
 

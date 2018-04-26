@@ -41,3 +41,13 @@ void Card::setPinyin(QString pinyin){
 void Card::setChinese(QString chinese){
     chineseText = new QString(chinese);
 }
+
+QDebug operator<<(QDebug os, const Card& card){
+    os << card.getEnglish() << card.getPinyin() << card.getChinese();
+    return os;
+}
+
+bool Card::operator==(const Card& rhs) const{
+    qInfo() << "Calling ==";
+    return (this->getEnglish() == rhs.getEnglish()) && (this->getPinyin() == rhs.getPinyin()) && (this->getChinese() == rhs.getChinese());
+}

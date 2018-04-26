@@ -3,7 +3,7 @@
 
 #include <QtCore>
 #include <QString>
-
+#include <QDebug>
 class Card
 {
 public:
@@ -16,10 +16,13 @@ public:
     void setEnglish(QString english);
     void setPinyin(QString pinyin);
     void setChinese(QString chinese);
+    bool operator==(const Card& rhs) const;
 private:
     QString* englishText;
     QString* pinyinText;
     QString* chineseText;
+    friend QDebug operator<<(QDebug os, const Card& card);
+
 };
 
 #endif // CARD_H
