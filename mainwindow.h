@@ -152,7 +152,7 @@ private slots:
     void on_hideNewCardMadeLabel();
 
     void cardUpdater(Card newCard);
-    void cardLoader();
+    void quizLoader(QString quizName);
     void createEditQuizButton_clicked();
     void saveQuizButton_clicked();
     void loadQuizButton_clicked();

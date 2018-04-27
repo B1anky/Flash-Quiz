@@ -3,6 +3,10 @@
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
+
+    delete findChild<QToolBar *>(); // NULL return value is ok for delete
+    delete findChild<QMenuBar *>(); // NULL return value is ok for delete
+
     languageEnglish = true;
 
     backGroundLayout = new QHBoxLayout();
@@ -352,8 +356,6 @@ void MainWindow::initializeNewQuiz(){
     verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     verticalLayout->addItem(verticalSpacer_9);
 
-    //verticalLayout->addWidget(backButton);
-
     verticalLayout->addItem(verticalSpacer_5);
 
     quizTextEdit = new DropDownTextEdit(quizList);
@@ -364,7 +366,7 @@ void MainWindow::initializeNewQuiz(){
     sizePolicy.setHeightForWidth(quizTextEdit->sizePolicy().hasHeightForWidth());
     quizTextEdit->setSizePolicy(sizePolicy);
     quizTextEdit->setMinimumSize(QSize(0, 50));
-    quizTextEdit->setMaximumSize(QSize(16777215, 50));
+    quizTextEdit->setMaximumSize(QSize(1920, 50));
     quizTextEdit->setDefaultText("Insert quiz name here");
     quizTextEdit->setText(quizTextEdit->getDefaultText());
     quizTextEdit->setFont(*textEditFont);
@@ -475,36 +477,42 @@ void MainWindow::cardUpdater(Card newCard){
     quizCard->setIconSize(QSize(380, 315));
     userCards.push_back(quizCard->getCardRef());
     physicalCardButtonList.push_back(quizCard);
-    inner->addWidget(quizCard, (userCards.size() - 1) / 2, (userCards.size() - 1) % 2, Qt::AlignRight);
+    inner->addWidget(quizCard, (userCards.size() - 1) / 2, (userCards.size() - 1) % 2, Qt::AlignTop);
 }
 
-void MainWindow::cardLoader(){
-    /*testing populating scroll area*/
-    for(int i = 0; i < userCards.size(); i++){
-        QuizCard *quizCard = new QuizCard(*userCards[i], selectedCards);
-        quizCard->setMinimumHeight(250);
-        quizCard->setMinimumWidth(425);
-        quizCard->setMaximumHeight(250);
-        quizCard->setMaximumWidth(425);
-        QPixmap *cardImg = new QPixmap(*pix1);
-        QPainter painter(cardImg);
-        painter.setFont(*cardFont);
-        painter.drawText(QPoint(200, 285), quizCard->getCard().getEnglish());
-        painter.drawText(QPoint(200, 540), quizCard->getCard().getPinyin());
-        painter.drawText(QPoint(200, 800), quizCard->getCard().getChinese());
-        QIcon ButtonIcon(*cardImg);
-        quizCard->setIcon(ButtonIcon);
-        quizCard->setIconSize(QSize(380, 315));
-        userCards.push_back(quizCard->getCardRef());
-        physicalCardButtonList.push_back(quizCard);
-        inner->addWidget(quizCard, i/2, i%2, Qt::AlignRight);
+void MainWindow::quizLoader(QString quizName){
+    //Search through quiz and set physicalButtonList cards as selected
+    //First find correct quiz in quizList
+    for(auto quiz : quizList){
+        if(quiz.first == quizName){
+            //Reset selected Cards
+            int i = 0;
+            for(auto selection : selectedCards){
+                if(*physicalCardButtonList[i]->getCardRef() == *selection){
+                    physicalCardButtonList[i]->setClicked(false);
+                    physicalCardButtonList[i]->setStyleSheet("");
+                }
+                i++;
+            }
+            selectedCards.clear();
+            i = 0;
+            for(auto card : quiz.second){
+                if(*physicalCardButtonList[i]->getCardRef() == *card){
+                    selectedCards.push_back(card);
+                    physicalCardButtonList[i]->setClicked(true);
+                    physicalCardButtonList[i]->setStyleSheet("background-color: rgb(255, 0, 0);");
+                }
+                i++;
+            }
+
+            break;
+        }
     }
 }
 
 void MainWindow::cardDisplayer(){
     for(int i = 0; i < physicalCardButtonList.size(); i++){
-        qInfo() << i;
-        inner->addWidget(physicalCardButtonList[i], i/2, i%2, Qt::AlignRight);
+        inner->addWidget(physicalCardButtonList[i], i/2, i%2, Qt::AlignTop);
     }
 }
 
@@ -686,7 +694,7 @@ void MainWindow::showMakeQuizMenu(){
     backGround->setPixmap(*new QPixmap());
 
     //add back button
-    //verticalLayout->addWidget(backButton);
+    verticalLayout->insertWidget(1, backButton);
     backButton->show();
 
     viewport = new QWidget;
@@ -715,6 +723,7 @@ void MainWindow::showMakeQuizMenu(){
 
 void MainWindow::hideQuizMenu(){
     //Hide quiz menu widgets
+    quizTextEdit->setDefaultText(quizTextEdit->getDefaultText());
     quizTextEdit->hide();
     createEditQuizButton->hide();
     saveQuizButton->hide();
@@ -723,7 +732,11 @@ void MainWindow::hideQuizMenu(){
     deleteSelectedCardsButton->hide();
     gridLayoutWidget->hide();
     verticalLayout->removeWidget(backButton);
+
+    verticalLayout->removeWidget(backButton);
+    backButton->deleteLater();
     initializeBackButton();
+    backButton->show();
 }
 
 void MainWindow::showNewCard(){
@@ -761,10 +774,18 @@ void MainWindow::showMenu(){
 void MainWindow::createEditQuizButton_clicked(){
     //Search the quizList for the string pair name that corresponds to quizTextEdit's text
     //If there's a match, then we're updating/adding to a current quiz, otherwise we're appending a new quiz
-    for(auto quiz: quizList){
+    for(auto& quiz: quizList){
         if(quiz.first == quizTextEdit->text()){
-            quiz.second = selectedCards;
-            break;
+            qInfo() << "Reassigning quiz.second";
+            for(auto card: selectedCards){
+                qDebug() << *card;
+            }
+            quiz.second = QVector<Card*>(selectedCards);
+
+            for(auto card: quiz.second){
+                qDebug() << *card;
+            }
+            return;
         }
     }
 
@@ -787,7 +808,7 @@ void MainWindow::saveQuizButton_clicked(){
 
 //This reads a save file and loads into quizList and userCards
 void MainWindow::loadQuizButton_clicked(){
-
+    quizLoader(quizTextEdit->text());
 }
 
 //Clears quizList
@@ -809,26 +830,20 @@ void MainWindow::deleteSelectedCardsButton_clicked(){
     //O(n^2) solution maybe make better in the future
     //for every card in selectedCards, remove from userCards
     qInfo() << "Calling delete";
-    for(auto toDelete : selectedCards){
-        int i = 0;
-        selectedCards.removeOne(toDelete);
-        //search through userCards for match and remove element in userCards
-        for(auto userCard : userCards){
-            if(userCard == toDelete){
-                qInfo() << "Removing card";
-                userCards.removeOne(userCard);
-                inner->removeWidget(physicalCardButtonList[i]);
-                physicalCardButtonList.removeAt(i);
+
+    for(int i = selectedCards.size() - 1; i >= 0; i--){
+        for(int j = userCards.size() - 1; j >= 0; j--){
+            if(userCards[j] == selectedCards[i]){
+                userCards.remove(j);
+                selectedCards.remove(i);
+                inner->removeWidget(physicalCardButtonList[j]);
+                physicalCardButtonList.remove(j);
             }
-            i++;
         }
     }
 
-
     //Create a widget and set its layout as your new layout created above
     gridLayout->removeWidget(scrollArea);
-    //viewport->setLayout(nullptr);
-    //gridLayout->setContentsMargins(0, 0, 0, 0);
 
     viewport = new QWidget;
     viewport->setLayout(inner);
@@ -839,7 +854,10 @@ void MainWindow::deleteSelectedCardsButton_clicked(){
 
     gridLayout->addWidget(scrollArea);
 
-    //create a new visualizer
+    //Revisualize the cards
     cardDisplayer();
+
+    hideQuizMenu();
+    showMakeQuizMenu();
 
 }

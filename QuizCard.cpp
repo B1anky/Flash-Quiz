@@ -30,7 +30,7 @@ void QuizCard::mouseReleaseEvent(QMouseEvent * event){
 
         clicked = false;
     }
-};
+}
 
 Card QuizCard::getCard() const{
     return *card;
@@ -38,4 +38,8 @@ Card QuizCard::getCard() const{
 
 Card* QuizCard::getCardRef() const{
     return card;
+}
+
+void QuizCard::setClicked(bool clickedIn){
+    clicked = clickedIn;
 }

@@ -16,6 +16,7 @@ public:
     QVector<Card*>* selected;
     Card getCard() const;
     Card* getCardRef() const;
+    void setClicked(bool clickedIn);
 private:
     Card* card;
     bool clicked;
