@@ -480,35 +480,6 @@ void MainWindow::cardUpdater(Card newCard){
     inner->addWidget(quizCard, (userCards.size() - 1) / 2, (userCards.size() - 1) % 2, Qt::AlignTop);
 }
 
-void MainWindow::quizLoader(QString quizName){
-    //Search through quiz and set physicalButtonList cards as selected
-    //First find correct quiz in quizList
-    for(auto quiz : quizList){
-        if(quiz.first == quizName){
-            //Reset selected Cards
-            int i = 0;
-            for(auto selection : selectedCards){
-                if(*physicalCardButtonList[i]->getCardRef() == *selection){
-                    physicalCardButtonList[i]->setClicked(false);
-                    physicalCardButtonList[i]->setStyleSheet("");
-                }
-                i++;
-            }
-            selectedCards.clear();
-            i = 0;
-            for(auto card : quiz.second){
-                if(*physicalCardButtonList[i]->getCardRef() == *card){
-                    selectedCards.push_back(card);
-                    physicalCardButtonList[i]->setClicked(true);
-                    physicalCardButtonList[i]->setStyleSheet("background-color: rgb(255, 0, 0);");
-                }
-                i++;
-            }
-
-            break;
-        }
-    }
-}
 
 void MainWindow::cardDisplayer(){
     for(int i = 0; i < physicalCardButtonList.size(); i++){
@@ -774,23 +745,19 @@ void MainWindow::showMenu(){
 void MainWindow::createEditQuizButton_clicked(){
     //Search the quizList for the string pair name that corresponds to quizTextEdit's text
     //If there's a match, then we're updating/adding to a current quiz, otherwise we're appending a new quiz
-    for(auto& quiz: quizList){
-        if(quiz.first == quizTextEdit->text()){
-            qInfo() << "Reassigning quiz.second";
-            for(auto card: selectedCards){
-                qDebug() << *card;
+    for(auto quiz = quizList.begin(); quiz != quizList.end(); ++quiz){
+        if(quiz->first == quizTextEdit->text()){
+            qInfo() << "Reassigning quiz->second";
+            for(auto card = selectedCards.begin(); card != selectedCards.end(); ++card){
+                qDebug() << **card;
             }
-            quiz.second = QVector<Card*>(selectedCards);
-
-            for(auto card: quiz.second){
-                qDebug() << *card;
-            }
+            quiz->second = new QVector<Card*>(selectedCards);
             return;
         }
     }
 
     //otherwise need to append a new list to quizList
-    quizList.push_back(QPair<QString, QVector<Card*>>(quizTextEdit->text(), selectedCards));
+    quizList.push_back(QPair<QString, QVector<Card*>*>(quizTextEdit->text(), new QVector<Card*>(selectedCards)));
 
     //update the completer
     quizTextEdit->updateCompleter(quizList);
@@ -798,18 +765,59 @@ void MainWindow::createEditQuizButton_clicked(){
 
 //This writes to the text file the quiz cards and quizzes
 void MainWindow::saveQuizButton_clicked(){
+    /*
     for(auto quiz: quizList){
         qInfo() << quiz.first;
-        for(auto card : quiz.second){
+        for(auto card : *(quiz.second)){
             qInfo() << *card;
         }
     }
+*/
+
+    for(auto card : selectedCards){
+        qInfo() << *card;
+    }
+    qInfo() << "\n";
+
 }
 
 //This reads a save file and loads into quizList and userCards
 void MainWindow::loadQuizButton_clicked(){
     quizLoader(quizTextEdit->text());
 }
+
+void MainWindow::quizLoader(QString quizName){
+    //Search through quiz and set physicalButtonList cards as selected
+    //First find correct quiz in quizList
+    for(auto quiz : quizList){
+        if(quiz.first == quizName){
+            //Reset selected Cards
+            for(int i = 0; i < physicalCardButtonList.size(); i++){
+                physicalCardButtonList[i]->setClicked(false);
+                physicalCardButtonList[i]->setStyleSheet("");
+            }
+
+            selectedCards.clear();
+
+            qInfo() << "Starting load loop";
+            for(int i = 0; i < physicalCardButtonList.size(); i++){
+                for(int j = 0; j < quiz.second->size(); j++){
+                    if(physicalCardButtonList[i]->getCard() == *(quiz.second->operator[](j))){
+                        qInfo() << "Selecting card at index: " << i;
+                        qDebug() << "physicalCardButtonList[" << i << "]->getCard() = " << physicalCardButtonList[i]->getCard();
+                        selectedCards.push_back(new Card(physicalCardButtonList[i]->getCard()));
+                        physicalCardButtonList[i]->setClicked(true);
+                        physicalCardButtonList[i]->setStyleSheet("background-color: rgb(255, 0, 0);");
+                        break;
+                    }
+                }
+            }
+            // break because we found the quiz and there will only be one occurrance of it
+            break;
+        }
+    }
+}
+
 
 //Clears quizList
 void MainWindow::deleteQuizButton_clicked(){
@@ -818,6 +826,12 @@ void MainWindow::deleteQuizButton_clicked(){
         if(quizList[i].first == quizTextEdit->text()){
             quizList.remove(i);
             qInfo() << "deleting quiz";
+            //Reset selected Cards
+            for(int i = 0; i < physicalCardButtonList.size(); i++){
+                physicalCardButtonList[i]->setClicked(false);
+                physicalCardButtonList[i]->setStyleSheet("");
+            }
+            selectedCards.clear();
             break;
         }
     }
@@ -831,13 +845,28 @@ void MainWindow::deleteSelectedCardsButton_clicked(){
     //for every card in selectedCards, remove from userCards
     qInfo() << "Calling delete";
 
+    //Loop through every quiz and remove the card from it first
+    for(auto quiz : quizList){
+        for(auto selectedCard : selectedCards){
+            for(auto qCard : *quiz.second){
+                if(*selectedCard == *qCard){
+                    quiz.second->removeOne(qCard);
+                }
+            }
+        }
+    }
+
     for(int i = selectedCards.size() - 1; i >= 0; i--){
         for(int j = userCards.size() - 1; j >= 0; j--){
-            if(userCards[j] == selectedCards[i]){
-                userCards.remove(j);
-                selectedCards.remove(i);
-                inner->removeWidget(physicalCardButtonList[j]);
-                physicalCardButtonList.remove(j);
+            if(userCards[j] && selectedCards[i] && !physicalCardButtonList.empty()){
+                if(*userCards[j] == *selectedCards[i]){
+                    userCards.remove(j);
+                    selectedCards.remove(i);
+                    inner->removeWidget(physicalCardButtonList[j]);
+                    physicalCardButtonList.remove(j);
+                }
+                while(i > selectedCards.size()) i--;
+                while(j > userCards.size()) j--;
             }
         }
     }

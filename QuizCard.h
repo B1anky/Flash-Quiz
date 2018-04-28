@@ -13,6 +13,7 @@ class QuizCard : public QPushButton {
 public:
     QuizCard();
     QuizCard(Card cardIn, QVector<Card*>& selectedCards);
+    //QuizCard(const QuizCard& quizCardIn, QVector<Card*>& selectedCardsIn);
     QVector<Card*>* selected;
     Card getCard() const;
     Card* getCardRef() const;

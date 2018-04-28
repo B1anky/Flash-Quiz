@@ -61,7 +61,7 @@ private:
     QVector<HoverButton*> pinButtonList;
     QVector<Card*> userCards;
     QVector<Card*> selectedCards;
-    QVector<QPair<QString, QVector<Card*>>> quizList;
+    QVector<QPair<QString, QVector<Card*>*>> quizList;
     QVector<QuizCard*> physicalCardButtonList;
 
     //QObjects for main menu

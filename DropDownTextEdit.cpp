@@ -1,6 +1,6 @@
 #include "DropDownTextEdit.h"
 
-DropDownTextEdit::DropDownTextEdit(QVector<QPair<QString, QVector<Card*>>> quizListIn){
+DropDownTextEdit::DropDownTextEdit(QVector<QPair<QString, QVector<Card*>*>> quizListIn){
     updateCompleter(quizListIn);
 }
 
@@ -28,12 +28,12 @@ void DropDownTextEdit::focusOutEvent(QFocusEvent *e){
     QLineEdit::focusInEvent(e);
 }
 
-void DropDownTextEdit::updateCompleter(QVector<QPair<QString, QVector<Card*>>> quizListIn){
+void DropDownTextEdit::updateCompleter(QVector<QPair<QString, QVector<Card*>*>> quizListIn){
     if(quizListIn.empty()){
         this->setCompleter(nullptr);
         return;
     }
-
+    quizNames.clear();
     for(auto quiz: quizListIn){
         qInfo() << quiz.first;
         quizNames << quiz.first;
