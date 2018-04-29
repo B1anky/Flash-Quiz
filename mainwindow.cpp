@@ -773,12 +773,57 @@ void MainWindow::saveQuizButton_clicked(){
         }
     }
 */
-
+/*
     for(auto card : selectedCards){
         qInfo() << *card;
     }
     qInfo() << "\n";
+*/
 
+    //First prompt the user for their profile name if it isn't currently set
+    bool getNameOkay = false;
+
+    MyInputDialog* getUserName = new MyInputDialog(nullptr, 750, 200);
+    if(profileName == "Guest"){
+        profileName = getUserName->getText(profileName, &getNameOkay);
+    }else{
+        profileName = getUserName->updateText(profileName, &getNameOkay);
+    }
+
+    if(profileName != "Guest" && getNameOkay){
+        QString dialogPromptText = profileName + " would you like to save your Flash Quiz profile?";
+        QString fileName = QFileDialog::getSaveFileName(this, tr(dialogPromptText.toStdString().c_str()), "", tr("Flash Quiz File(*.fqf);;All Files (*)"));
+
+        if (fileName.isEmpty()){
+            return;
+        }else{
+            QFile file(fileName);
+            if(!file.open(QIODevice::WriteOnly)){
+                QMessageBox::information(this, tr("Unable to open file"), file.errorString());
+                return;
+            }
+
+            QDataStream out(&file);
+            out.setVersion(QDataStream::Qt_4_5);
+
+            //Construct the string to write to the file
+            QString output = constructSaveFile();
+
+
+            //out << contacts;
+
+        }
+    }
+}
+
+QString MainWindow::constructSaveFile(){
+    //This text file will consist of a name
+
+    //First bring up a dialog
+
+
+
+    return "";
 }
 
 //This reads a save file and loads into quizList and userCards

@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     QuizCard.cpp \
     QuizEditor.cpp \
     DropDownTextEdit.cpp \
-    HoverButton.cpp
+    HoverButton.cpp \
+    MyInputDialog.cpp
 
 HEADERS  += mainwindow.h \
     Card.h \
@@ -26,7 +27,8 @@ HEADERS  += mainwindow.h \
     QuizCard.h \
     QuizEditor.h \
     DropDownTextEdit.h \
-    HoverButton.h
+    HoverButton.h \
+    MyInputDialog.h
 
 FORMS    += mainwindow.ui \
     QuizEditor.ui \

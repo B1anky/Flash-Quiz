@@ -6,6 +6,7 @@
 #include "QuizCard.h"
 #include "QuizEditor.h"
 #include "HoverButton.h"
+#include <MyInputDialog.h>
 #include <DropDownTextEdit.h>
 #include <QMainWindow>
 #include <QtCore>
@@ -23,6 +24,9 @@
 #include <QListWidget>
 #include <QPainter>
 #include <QPair>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QSizePolicy>
 
 namespace Ui {
 class MainWindow;
@@ -63,6 +67,9 @@ private:
     QVector<Card*> selectedCards;
     QVector<QPair<QString, QVector<Card*>*>> quizList;
     QVector<QuizCard*> physicalCardButtonList;
+
+    //Current profile's name
+    QString profileName = "Guest";
 
     //QObjects for main menu
     QLabel* titleLabel;
@@ -152,10 +159,11 @@ private slots:
     void on_hideNewCardMadeLabel();
 
     void cardUpdater(Card newCard);
-    void quizLoader(QString quizName);
     void createEditQuizButton_clicked();
     void saveQuizButton_clicked();
+    QString constructSaveFile();
     void loadQuizButton_clicked();
+    void quizLoader(QString quizName);
     void deleteQuizButton_clicked();
     void deleteSelectedCardsButton_clicked();
 };
