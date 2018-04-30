@@ -59,6 +59,7 @@ private:
     void showMakeQuizMenu();
     void hideQuizMenu();
     void cardDisplayer();
+    void fireAnimation();
 
     Ui::MainWindow *ui;
     QGridLayout *mainLayout;
@@ -100,8 +101,7 @@ private:
     HoverButton* tone2Button;
     HoverButton* tone3Button;
     HoverButton* tone4Button;
-    //QVector<Card> cardList;
-    QLabel* cardMadeLabel;
+    QLabel* notificationLabel;
 
 
     //QObjects for new / Edit Quiz
@@ -162,7 +162,7 @@ private slots:
     void on_tone2Button_clicked();
     void on_tone3Button_clicked();
     void on_tone4Button_clicked();
-    void on_hideNewCardMadeLabel();
+    void on_hideNotificationLabel();
 
     void cardUpdater(Card newCard);
     void createEditQuizButton_clicked();

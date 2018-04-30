@@ -48,6 +48,6 @@ QDebug operator<<(QDebug os, const Card& card){
 }
 
 bool Card::operator==(const Card& rhs) const{
-    qInfo() << "Calling ==";
+    //qInfo() << "Calling ==";
     return (*englishText == *rhs.englishText) && (*pinyinText == *rhs.pinyinText) && (*chineseText == *rhs.chineseText);
 }

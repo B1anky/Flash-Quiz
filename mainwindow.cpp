@@ -293,36 +293,20 @@ void MainWindow::on_acceptNewCardButton_clicked(){
     if(cardMade){
         Card* newCard = new Card(englishText->toPlainText(), pinyinText->toPlainText(), chineseText->toPlainText());
         cardUpdater(*newCard);
+
+        notificationLabel->setText("New card Added!");
         //Fade in label
-        QGraphicsOpacityEffect *fadeInEff = new QGraphicsOpacityEffect(this);
-        cardMadeLabel->setGraphicsEffect(fadeInEff);
-        cardMadeLabel->show();
-        QPropertyAnimation *fadeIn = new QPropertyAnimation(fadeInEff,"opacity");
-        fadeIn->setDuration(5000);
-        fadeIn->setStartValue(0);
-        fadeIn->setEndValue(1);
-        fadeIn->setEasingCurve(QEasingCurve::InBack);
-        fadeIn->start(QPropertyAnimation::DeleteWhenStopped);
+        fireAnimation();
 
         for(auto text: newCardList){
             text->setText(text->getDefaultText());
         }
 
-        //Fade out label
-        QGraphicsOpacityEffect *fadeOutEff = new QGraphicsOpacityEffect(this);
-        cardMadeLabel->setGraphicsEffect(fadeOutEff);
-        QPropertyAnimation *fadeOut = new QPropertyAnimation(fadeOutEff,"opacity");
-        fadeOut->setDuration(5000);
-        fadeOut->setStartValue(1);
-        fadeOut->setEndValue(0);
-        fadeOut->setEasingCurve(QEasingCurve::OutBack);
-        fadeOut->start(QPropertyAnimation::DeleteWhenStopped);
-        connect(fadeOut,SIGNAL(finished()),this,SLOT(on_hideNewCardMadeLabel()));
     }
 }
 
-void MainWindow::on_hideNewCardMadeLabel(){
-    cardMadeLabel->hide();
+void MainWindow::on_hideNotificationLabel(){
+    notificationLabel->hide();
 }
 
 
@@ -444,6 +428,7 @@ void MainWindow::initializeNewQuiz(){
     gridLayout->setObjectName(QStringLiteral("gridLayout"));
     gridLayout->setContentsMargins(0, 0, 0, 0);
 
+    cardDisplayer();
 
     inner = new QGridLayout;
 
@@ -534,16 +519,16 @@ void MainWindow::initializeNewCard(){
     acceptNewCardButton->setText("Accept");
     acceptNewCardButton->hide();
 
-    cardMadeLabel = new QLabel();
-    cardMadeLabel->setText("Card was successfully created!");
-    cardMadeLabel->setFont(*titleFont);
-    cardMadeLabel->setMinimumWidth(this->width());
-    cardMadeLabel->setMaximumHeight(buttonHeight + 25);
-    cardMadeLabel->setStyleSheet("background-color: rgba(255, 255, 255, 100);");
-    cardMadeLabel->move(this->width()/2 - cardMadeLabel->width()/2 + 25, this->height()/2  - cardMadeLabel->height()/2 - 235);
-    cardMadeLabel->setParent(this);
-    cardMadeLabel->setAlignment(Qt::AlignCenter);
-    cardMadeLabel->hide();
+    notificationLabel = new QLabel();
+    notificationLabel->setText("Card was successfully created!");
+    notificationLabel->setFont(*titleFont);
+    notificationLabel->setMinimumWidth(this->width());
+    notificationLabel->setMaximumHeight(buttonHeight + 25);
+    notificationLabel->setStyleSheet("background-color: rgba(255, 255, 255, 100);");
+    notificationLabel->move(this->width()/2 - notificationLabel->width()/2 + 25, this->height()/2  - notificationLabel->height()/2 - 235);
+    notificationLabel->setParent(this);
+    notificationLabel->setAlignment(Qt::AlignCenter);
+    notificationLabel->hide();
 
     tone0Button = new HoverButton;
     tone1Button = new HoverButton;
@@ -656,7 +641,7 @@ void MainWindow::on_loadProfileButton_clicked(){
                 qDebug() << *card;
             }
         }
-        initializeNewQuiz();
+        //initializeNewQuiz();
     }
 }
 
@@ -679,12 +664,12 @@ bool MainWindow::loadProfile(){
         // clear existing profile
         quizList.clear();
         userCards.clear();
+        selectedCards.clear();
         physicalCardButtonList.clear();
 
         QString line = inStream.readAll();
         int lineCnt = 0;
-        bool parsingQuiz = false;
-        bool parsingCards = true;
+
         QStringList fields = line.split("╫");
         for(int i = 0; i < fields.size() - 1; i++){
             if(i == 0){
@@ -699,7 +684,7 @@ bool MainWindow::loadProfile(){
                     QString chinese = curCard[j+2];
                     Card* newCard = new Card(english, pinyin, chinese);
                     cardUpdater(*newCard);
-                    qDebug() << *newCard;
+                    //qDebug() << *newCard;
                 }
             }else{
                 qDebug() <<"Quiz" << (i - 1);
@@ -713,7 +698,7 @@ bool MainWindow::loadProfile(){
                     QString chinese = curQuiz[j+2];
                     Card* newCard = new Card(english, pinyin, chinese);
                     newQuizList->push_back(newCard);
-                    qDebug() << "loop:" << *newCard;
+                    //qDebug() << "loop:" << *newCard;
                 }
 
                 quizList.push_back(QPair<QString, QVector<Card*>*>(*quizName, newQuizList));
@@ -738,11 +723,9 @@ bool MainWindow::loadProfile(){
     //Revisualize the cards
     cardDisplayer();
 
-    hideQuizMenu();
-    backButton->hide();
-
-    cardDisplayer();
     qDebug() << "Done loading";
+
+    return true;
 }
 
 
@@ -762,7 +745,7 @@ void MainWindow::hideNewCard(){
     for(auto pinButton : pinButtonList){
         pinButton->hide();
     }
-    cardMadeLabel->hide();
+    notificationLabel->hide();
 }
 
 void MainWindow::showMakeQuizMenu(){
@@ -826,7 +809,7 @@ void MainWindow::showNewCard(){
     for(auto button: pinButtonList){
         button->show();
     }
-    cardMadeLabel->setStyleSheet("background-color: rgba(0,0,0,0%)");
+    notificationLabel->setStyleSheet("background-color: rgba(0,0,0,0%)");
 }
 
 void MainWindow::hideMenu(){
@@ -847,6 +830,32 @@ void MainWindow::showMenu(){
     }
 }
 
+void MainWindow::fireAnimation(){
+    //Fade in label
+    qDebug() << "Animate!";
+    //notificationLabel->raise();
+    QGraphicsOpacityEffect *fadeInEff = new QGraphicsOpacityEffect(this);
+    notificationLabel->setGraphicsEffect(fadeInEff);
+    notificationLabel->show();
+    QPropertyAnimation *fadeIn = new QPropertyAnimation(fadeInEff,"opacity");
+    fadeIn->setDuration(5000);
+    fadeIn->setStartValue(0);
+    fadeIn->setEndValue(1);
+    fadeIn->setEasingCurve(QEasingCurve::InBack);
+    fadeIn->start(QPropertyAnimation::DeleteWhenStopped);
+
+    //Fade out label
+    QGraphicsOpacityEffect *fadeOutEff = new QGraphicsOpacityEffect(this);
+    notificationLabel->setGraphicsEffect(fadeOutEff);
+    QPropertyAnimation *fadeOut = new QPropertyAnimation(fadeOutEff,"opacity");
+    fadeOut->setDuration(5000);
+    fadeOut->setStartValue(1);
+    fadeOut->setEndValue(0);
+    fadeOut->setEasingCurve(QEasingCurve::OutBack);
+    fadeOut->start(QPropertyAnimation::DeleteWhenStopped);
+    connect(fadeOut,SIGNAL(finished()),this,SLOT(on_hideNotificationLabel()));
+}
+
 //create a new quiz based on quizTextEdit's content
 void MainWindow::createEditQuizButton_clicked(){
     //Search the quizList for the string pair name that corresponds to quizTextEdit's text
@@ -854,10 +863,13 @@ void MainWindow::createEditQuizButton_clicked(){
     for(auto quiz = quizList.begin(); quiz != quizList.end(); ++quiz){
         if(quiz->first == quizTextEdit->text()){
             qInfo() << "Reassigning quiz->second";
+            //Set up label text
+            notificationLabel->setText(quiz->first + " has been updated!");
             for(auto card = selectedCards.begin(); card != selectedCards.end(); ++card){
                 qDebug() << **card;
             }
             quiz->second = new QVector<Card*>(selectedCards);
+            fireAnimation();
             return;
         }
     }
@@ -867,6 +879,10 @@ void MainWindow::createEditQuizButton_clicked(){
 
     //update the completer
     quizTextEdit->updateCompleter(quizList);
+    notificationLabel->setText(quizTextEdit->text() + " has been created!");
+
+    //setAnimation
+    fireAnimation();
 }
 
 //This writes to the text file the quiz cards and quizzes
@@ -906,6 +922,8 @@ void MainWindow::saveQuizButton_clicked(){
 
             file.close();
 
+            notificationLabel->setText(profileName + ", your profile has been saved!");
+            fireAnimation();
         }
     }
 }
@@ -914,7 +932,7 @@ QString MainWindow::constructSaveFile(){
     //This text file will consist of a name
     QString output = profileName + "\n";
 
-    //alt 223
+    //alt 215
     output += "╫\n";
 
     for(auto card : userCards){
@@ -933,15 +951,17 @@ QString MainWindow::constructSaveFile(){
             output += card->getPinyin() + "\n";
             output += card->getChinese() + "\n";
         }
+        output += "╫\n";
     }
-    //alt 215
-    output += "╫";
+
     return output;
 }
 
 //This reads a save file and loads into quizList and userCards
 void MainWindow::loadQuizButton_clicked(){
     quizLoader(quizTextEdit->text());
+    notificationLabel->setText(quizTextEdit->text() + " has been loaded!");
+    fireAnimation();
 }
 
 void MainWindow::quizLoader(QString quizName){
@@ -996,6 +1016,9 @@ void MainWindow::deleteQuizButton_clicked(){
 
     //update the completer
     quizTextEdit->updateCompleter(quizList);
+
+    notificationLabel->setText(quizTextEdit->text() + " has been deleted!");
+    fireAnimation();
 }
 
 void MainWindow::deleteSelectedCardsButton_clicked(){
@@ -1047,4 +1070,6 @@ void MainWindow::deleteSelectedCardsButton_clicked(){
     hideQuizMenu();
     showMakeQuizMenu();
 
+    notificationLabel->setText("Selected Card have been deleted!");
+    fireAnimation();
 }
