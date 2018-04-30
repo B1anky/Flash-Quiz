@@ -2,6 +2,11 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
+    QRect rec = QApplication::desktop()->screenGeometry();
+    this->resize(rec.height(), rec.height());
+    QSizePolicy qsp(QSizePolicy::Preferred,QSizePolicy::Preferred);
+    qsp.setHeightForWidth(true);
+    this->setSizePolicy(qsp);
     ui->setupUi(this);
 
     delete findChild<QToolBar *>(); // NULL return value is ok for delete
@@ -12,8 +17,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     backGroundLayout = new QHBoxLayout();
 
     //Flashcard set up
-    int windowH = 1080;
-    int windowW = 1500;
+    int windowH = rec.height();
+    int windowW = rec.height();
     backGround = new QLabel();
     backGround->setGeometry(QRect(203, 10, windowW, windowH));
 
@@ -592,24 +597,26 @@ void MainWindow::initializeMenuButtons(){
     titleLabel = new QLabel();
     newCardButton = new HoverButton();
     newQuizButton = new HoverButton();
+    loadProfileButton = new HoverButton();
     quizSelectButton = new HoverButton();
     randomAllButton = new HoverButton();
     lightningQuizButton = new HoverButton();
     statisticsButton = new HoverButton();
 
-    buttonList = {newCardButton, newQuizButton, quizSelectButton, randomAllButton, lightningQuizButton, statisticsButton};
+    buttonList = {newCardButton, newQuizButton, loadProfileButton, quizSelectButton, randomAllButton, lightningQuizButton, statisticsButton};
 
     if(languageEnglish == true){
         titleLabel->setText("Flash Quiz");
         newCardButton->setText("New Card");
         newQuizButton->setText("New / Edit Quiz");
+        loadProfileButton->setText("Load Profile");
         quizSelectButton->setText("Quiz Select");
         randomAllButton->setText("Random All Test");
         lightningQuizButton->setText("Lightning Quiz");
         statisticsButton->setText("Statistics");
     }
 
-    int curY = 215;
+    int curY = 145;
 
     titleFont->setPointSize(50);
     buttonFont->setPointSize(25);
@@ -633,11 +640,112 @@ void MainWindow::initializeMenuButtons(){
 
     connect(newCardButton, SIGNAL (released()), this, SLOT (on_newCardButton_clicked()));
     connect(newQuizButton, SIGNAL (released()), this, SLOT (on_newQuizButton_clicked()));
+    connect(loadProfileButton, SIGNAL (released()), this, SLOT (on_loadProfileButton_clicked()));
     connect(quizSelectButton, SIGNAL (released()), this, SLOT (on_quizSelectButton_clicked()));
     connect(randomAllButton, SIGNAL (released()), this, SLOT (on_randomAllButton_clicked()));
     connect(lightningQuizButton, SIGNAL (released()), this, SLOT (on_lightningQuizButton_clicked()));
     connect(statisticsButton, SIGNAL (released()), this, SLOT (on_statisticsButton_clicked()));
 }
+
+void MainWindow::on_loadProfileButton_clicked(){
+    bool loaded = loadProfile();
+    if(loaded){
+        for(auto quiz : quizList){
+            qDebug() << quiz.first;
+            for(auto card : *quiz.second){
+                qDebug() << *card;
+            }
+        }
+        initializeNewQuiz();
+    }
+}
+
+bool MainWindow::loadProfile(){
+    qDebug() << "Loading profile";
+    QString toParse;
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Flash Quiz Profile"), "", tr("Address Book (*.fqf);;All Files (*)"));
+    if(fileName.isEmpty()){
+        return false;
+    }else{
+        QFile file(fileName);
+
+        if (!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(this, tr("Unable to open file"), file.errorString());
+            return false;
+        }
+
+        QTextStream inStream(&file);
+        inStream.setCodec("UTF-8");
+        // clear existing profile
+        quizList.clear();
+        userCards.clear();
+        physicalCardButtonList.clear();
+
+        QString line = inStream.readAll();
+        int lineCnt = 0;
+        bool parsingQuiz = false;
+        bool parsingCards = true;
+        QStringList fields = line.split("╫");
+        for(int i = 0; i < fields.size() - 1; i++){
+            if(i == 0){
+                profileName = fields[0].remove("\n");
+                lineCnt++;
+            }else if(i == 1){
+                QStringList curCard = fields[1].split("\n");
+
+                for(int j = 1; j < curCard.size() - 3; j+=3){
+                    QString english = curCard[j];
+                    QString pinyin = curCard[j+1];
+                    QString chinese = curCard[j+2];
+                    Card* newCard = new Card(english, pinyin, chinese);
+                    cardUpdater(*newCard);
+                    qDebug() << *newCard;
+                }
+            }else{
+                qDebug() <<"Quiz" << (i - 1);
+                //Has to be a quiz
+                QStringList curQuiz = fields[i].split("\n");
+                QString* quizName = new QString(curQuiz[1]);
+                QVector<Card*>* newQuizList = new QVector<Card*>();
+                for(int j = 2; j < curQuiz.size() - 3; j += 3){
+                    QString english = curQuiz[j];
+                    QString pinyin = curQuiz[j+1];
+                    QString chinese = curQuiz[j+2];
+                    Card* newCard = new Card(english, pinyin, chinese);
+                    newQuizList->push_back(newCard);
+                    qDebug() << "loop:" << *newCard;
+                }
+
+                quizList.push_back(QPair<QString, QVector<Card*>*>(*quizName, newQuizList));
+            }
+        }
+    }
+
+
+    quizTextEdit->updateCompleter(quizList);
+
+    gridLayout->removeWidget(scrollArea);
+
+    viewport = new QWidget;
+    viewport->setLayout(inner);
+
+    //Add the viewport to the scroll area
+    scrollArea = new QScrollArea;
+    scrollArea->setWidget(viewport);
+
+    gridLayout->addWidget(scrollArea);
+
+    //Revisualize the cards
+    cardDisplayer();
+
+    hideQuizMenu();
+    backButton->hide();
+
+    cardDisplayer();
+    qDebug() << "Done loading";
+}
+
+
 
 void MainWindow::hideNewCard(){
     backButton->hide();
@@ -733,12 +841,10 @@ void MainWindow::showMenu(){
     backButton->hide();
     backGround->setPixmap(*pix1);
     titleLabel->show();
-    newCardButton->show();
-    newQuizButton->show();
-    quizSelectButton->show();
-    randomAllButton->show();
-    lightningQuizButton->show();
-    statisticsButton->show();
+
+    for(auto card: buttonList){
+        card->show();
+    }
 }
 
 //create a new quiz based on quizTextEdit's content
@@ -765,21 +871,6 @@ void MainWindow::createEditQuizButton_clicked(){
 
 //This writes to the text file the quiz cards and quizzes
 void MainWindow::saveQuizButton_clicked(){
-    /*
-    for(auto quiz: quizList){
-        qInfo() << quiz.first;
-        for(auto card : *(quiz.second)){
-            qInfo() << *card;
-        }
-    }
-*/
-/*
-    for(auto card : selectedCards){
-        qInfo() << *card;
-    }
-    qInfo() << "\n";
-*/
-
     //First prompt the user for their profile name if it isn't currently set
     bool getNameOkay = false;
 
@@ -803,14 +894,17 @@ void MainWindow::saveQuizButton_clicked(){
                 return;
             }
 
-            QDataStream out(&file);
-            out.setVersion(QDataStream::Qt_4_5);
+            QTextStream out(&file);
+            out.setCodec("UTF-8");
 
             //Construct the string to write to the file
-            QString output = constructSaveFile();
+            QString output =constructSaveFile();
 
+            //Pushes the stream to the file and saves it
+            out << output;
+            out.flush();
 
-            //out << contacts;
+            file.close();
 
         }
     }
@@ -818,12 +912,31 @@ void MainWindow::saveQuizButton_clicked(){
 
 QString MainWindow::constructSaveFile(){
     //This text file will consist of a name
+    QString output = profileName + "\n";
 
-    //First bring up a dialog
+    //alt 223
+    output += "╫\n";
+
+    for(auto card : userCards){
+        output += card->getEnglish() + "\n";
+        output += card->getPinyin() + "\n";
+        output += card->getChinese() + "\n";
+    }
 
 
+    output += "╫\n";
 
-    return "";
+    for(auto quiz : quizList){
+        output += quiz.first + "\n";
+        for(auto card : *quiz.second){
+            output += card->getEnglish() + "\n";
+            output += card->getPinyin() + "\n";
+            output += card->getChinese() + "\n";
+        }
+    }
+    //alt 215
+    output += "╫";
+    return output;
 }
 
 //This reads a save file and loads into quizList and userCards

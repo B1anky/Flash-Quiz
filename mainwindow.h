@@ -27,6 +27,8 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QSizePolicy>
+#include <QDesktopWidget>
+
 
 namespace Ui {
 class MainWindow;
@@ -40,9 +42,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     bool languageEnglish;
+    virtual int heightForWidth ( int w ) const { return w*9/16;};
 private:
 
     void initializeMenuButtons();
+    bool loadProfile();
     void initializeBackButton();
     void initializeQuizCreatorBackButton();
     void initializeNewCard();
@@ -75,6 +79,7 @@ private:
     QLabel* titleLabel;
     HoverButton* newCardButton;
     HoverButton* newQuizButton;
+    HoverButton* loadProfileButton;
     HoverButton* quizSelectButton;
     HoverButton* randomAllButton;
     HoverButton* lightningQuizButton;
@@ -143,6 +148,7 @@ private:
 private slots:
     void on_newCardButton_clicked();
     void on_newQuizButton_clicked();
+    void on_loadProfileButton_clicked();
     void on_quizSelectButton_clicked();
     void on_randomAllButton_clicked();
     void on_lightningQuizButton_clicked();
