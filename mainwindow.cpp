@@ -20,11 +20,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     int windowH = rec.height();
     int windowW = rec.height();
     backGround = new QLabel();
-    backGround->setGeometry(QRect(203, 10, windowW, windowH));
+    backGround->setGeometry(QRect(203, 10, windowW/2, windowH/2));
 
     pix1 = new QPixmap(":/new/pictures/flash-card.png");
+    *pix1 = pix1->scaled(rec.height()/2, rec.width()/2, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     backGround->setPixmap(*pix1);
-
+    QSizePolicy labelPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::Label);
+    QSizePolicy buttonPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::PushButton);
+    QSizePolicy lineEditPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::LineEdit);
 
     initializeMenuButtons();
     initializeBackButton();
@@ -579,6 +582,9 @@ void MainWindow::initializeBackButton(){
 }
 
 void MainWindow::initializeMenuButtons(){
+    QSizePolicy labelPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::Label);
+    QSizePolicy buttonPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::PushButton);
+
     titleLabel = new QLabel();
     newCardButton = new HoverButton();
     newQuizButton = new HoverButton();
@@ -606,16 +612,17 @@ void MainWindow::initializeMenuButtons(){
     titleFont->setPointSize(50);
     buttonFont->setPointSize(25);
 
-    titleLabel->setFixedWidth(buttonWidth * 2);
-    titleLabel->setFixedHeight(buttonHeight * 2);
+    titleLabel->setMaximumWidth(buttonWidth * 2);
+    titleLabel->setMaximumHeight(buttonHeight * 2);
     titleLabel->setFont(*titleFont);
     titleLabel->move(960 - 250/2, 0);
     titleLabel->setParent(this);
 
     for(auto button: buttonList){
         button->setAttribute(Qt::WA_Hover, true);
-        button->setFixedWidth(buttonWidth);
-        button->setFixedHeight(buttonHeight);
+        button->setMaximumWidth(buttonWidth);
+        button->setMaximumHeight(buttonHeight);
+        button->setSizePolicy(buttonPolicy);
         button->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         button->setFont(*buttonFont);
         button->move(960 - 350/2 , curY);
@@ -724,7 +731,8 @@ bool MainWindow::loadProfile(){
     cardDisplayer();
 
     qDebug() << "Done loading";
-
+    notificationLabel->setText("Welcome back, " + profileName);
+    fireAnimation();
     return true;
 }
 
@@ -1073,3 +1081,12 @@ void MainWindow::deleteSelectedCardsButton_clicked(){
     notificationLabel->setText("Selected Card have been deleted!");
     fireAnimation();
 }
+
+void MainWindow::resizeEvent(QResizeEvent* event){
+    if(event){
+        *pix1 = pix1->scaled(this->height(), this->width(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        backGround->setPixmap(*pix1);
+    }
+    //QWidget::resizeEvent(event);
+}
+

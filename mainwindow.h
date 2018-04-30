@@ -28,6 +28,7 @@
 #include <QInputDialog>
 #include <QSizePolicy>
 #include <QDesktopWidget>
+#include <QResizeEvent>
 
 
 namespace Ui {
@@ -60,6 +61,7 @@ private:
     void hideQuizMenu();
     void cardDisplayer();
     void fireAnimation();
+    void resizeEvent(QResizeEvent* event);
 
     Ui::MainWindow *ui;
     QGridLayout *mainLayout;
