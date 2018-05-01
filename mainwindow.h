@@ -29,6 +29,7 @@
 #include <QSizePolicy>
 #include <QDesktopWidget>
 #include <QResizeEvent>
+#include <QStackedLayout>
 
 
 namespace Ui {
@@ -63,9 +64,21 @@ private:
     void fireAnimation();
     void resizeEvent(QResizeEvent* event);
 
-    Ui::MainWindow *ui;
-    QGridLayout *mainLayout;
+
+    int resized = 0;
+
+    QStackedLayout* masterLayout;
     QLabel* backGround;
+    Ui::MainWindow *ui;
+
+    QWidget* mainMenuWidget;
+    QVBoxLayout *mainMenuLayout;
+
+    QWidget* newCardWidget;
+    QGridLayout* newCardLayout;
+
+    QWidget* quizLayoutWidget;
+    QHBoxLayout* quizLayout;
 
     QVector<HoverButton*> buttonList;
     QVector<MyTextEdit*> newCardList;
@@ -147,6 +160,9 @@ private:
     int buttonHeight = 50;
     int buttonWidth = 350;
 
+    int prevHeight;
+    int prevWidth;
+
 private slots:
     void on_newCardButton_clicked();
     void on_newQuizButton_clicked();
@@ -157,6 +173,7 @@ private slots:
     void on_statisticsButton_clicked();
 
     void on_backButton_clicked();
+    void resetFlashCardPalette();
 
     void on_acceptNewCardButton_clicked();
     void on_tone0Button_clicked();

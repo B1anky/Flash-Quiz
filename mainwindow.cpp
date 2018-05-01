@@ -14,39 +14,68 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     languageEnglish = true;
 
-    backGroundLayout = new QHBoxLayout();
+    //backGroundLayout = new QHBoxLayout();
 
     //Flashcard set up
     int windowH = rec.height();
     int windowW = rec.height();
     backGround = new QLabel();
-    backGround->setGeometry(QRect(203, 10, windowW/2, windowH/2));
+    backGround->setGeometry(QRect(203, 10, windowW, windowH));
+    backGround->setMaximumHeight(1920);
+    backGround->setMaximumHeight(1080);
 
     pix1 = new QPixmap(":/new/pictures/flash-card.png");
-    *pix1 = pix1->scaled(rec.height()/2, rec.width()/2, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-    backGround->setPixmap(*pix1);
+    *pix1 = pix1->scaled(rec.height(), rec.width(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    QPalette palette;
+    palette.setBrush(QPalette::Background, *pix1);
+    this->setPalette(palette);
+
     QSizePolicy labelPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::Label);
     QSizePolicy buttonPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::PushButton);
     QSizePolicy lineEditPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::LineEdit);
 
+    //Font info
+    cardFont->setPointSize(100);
+    textEditFont->setPointSize(25);
+    titleFont->setPointSize(50);
+    buttonFont->setPointSize(25);
+    pinyinButtonFont->setPointSize(12);
+
+    //Notification label will now be a global widget
+    notificationLabel = new QLabel();
+    notificationLabel->setText("Card was successfully created!");
+    notificationLabel->setFont(*titleFont);
+    notificationLabel->setMinimumWidth(this->width());
+    notificationLabel->setMaximumHeight(buttonHeight + 25);
+    notificationLabel->setStyleSheet("background-color: rgba(255, 255, 255, 100);");
+    //notificationLabel->move(this->width()/2 - notificationLabel->width()/2 + 25, this->height()/2  - notificationLabel->height()/2 - 235);
+    notificationLabel->setParent(this);
+    notificationLabel->setAlignment(Qt::AlignCenter);
+    notificationLabel->hide();
+
+    //All layouts for every page will be stored here for easy separation of show and hide
+    masterLayout = new QStackedLayout();
+
     initializeMenuButtons();
     initializeBackButton();
     initializeNewCard();
-    cardFont->setPointSize(100);
-    textEditFont->setPointSize(25);
+
     initializeNewQuiz();
-    hideQuizMenu();
-    showMenu();
+
+    //hideQuizMenu();
+    //showMenu();
 
 
-    backGroundLayout->addWidget(backGround);
-    backGroundLayout->setAlignment(Qt::AlignCenter);
 
-    mainLayout = new QGridLayout(this);
-    mainLayout->addLayout(backGroundLayout, 0, 0, Qt::AlignCenter);
 
-    this->centralWidget()->setLayout(mainLayout);
-    this->setWindowState(Qt::WindowMaximized);
+    prevHeight = this->height();
+    prevWidth = this->width();
+    this->centralWidget()->setLayout(masterLayout);
+    masterLayout->setCurrentWidget(mainMenuWidget);
+    //masterLayout->widget(0)->show();
+    //this->setWindowState(Qt::WindowMaximized);
+
+    //showNewCard();
 }
 
 MainWindow::~MainWindow()
@@ -292,15 +321,16 @@ void MainWindow::on_acceptNewCardButton_clicked(){
             cardMade = true;
         }
     }
-
+    qDebug() << "moshi moshi!";
     if(cardMade){
         Card* newCard = new Card(englishText->toPlainText(), pinyinText->toPlainText(), chineseText->toPlainText());
-        cardUpdater(*newCard);
+        //cardUpdater(*newCard); /* --------------------------DO NOT FORGET TO UNCOMMENT THIS-------------------------------- */
 
-        notificationLabel->setText("New card Added!");
+        //notificationLabel->setText("New card Added!");
         //Fade in label
+        qDebug() << "I want to make a label!";
         fireAnimation();
-
+        qDebug() << "I made a label!";
         for(auto text: newCardList){
             text->setText(text->getDefaultText());
         }
@@ -329,16 +359,25 @@ void MainWindow::on_statisticsButton_clicked(){
 
 }
 
+void MainWindow::resetFlashCardPalette(){
+    auto size = this->size();
+    auto pixNew = pix1->scaled(size.width(), size.height(), Qt::KeepAspectRatioByExpanding , Qt::FastTransformation);
+    QPalette palette;
+    palette.setBrush(QPalette::Background, pixNew);
+    this->setPalette(palette);
+}
+
 void MainWindow::on_backButton_clicked(){
-    hideNewCard();
-    hideQuizMenu();
-    showMenu();
+    masterLayout->setCurrentWidget(mainMenuWidget);
+    resetFlashCardPalette();
 }
 
 
 void MainWindow::initializeNewQuiz(){
-    backGround->setPixmap(*new QPixmap());
-    verticalLayoutWidget = new QWidget(this->centralWidget());
+    quizLayoutWidget = new QWidget();
+    quizLayout = new QHBoxLayout(quizLayoutWidget);
+
+    verticalLayoutWidget = new QWidget();
     verticalLayoutWidget->setObjectName(QStringLiteral("verticalLayoutWidget"));
     verticalLayoutWidget->setGeometry(QRect(10, 0, 951, 1021));
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
@@ -424,9 +463,9 @@ void MainWindow::initializeNewQuiz(){
     verticalLayout->addItem(verticalSpacer_8);
 
 
-    gridLayoutWidget = new QWidget(this->centralWidget());
+    gridLayoutWidget = new QWidget(this);
     gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
-    gridLayoutWidget->setGeometry(QRect(970, 10, 941, 1011));
+    //gridLayoutWidget->setGeometry(QRect(970, 10, 941, 1011));
     gridLayout = new QGridLayout(gridLayoutWidget);
     gridLayout->setObjectName(QStringLiteral("gridLayout"));
     gridLayout->setContentsMargins(0, 0, 0, 0);
@@ -445,6 +484,11 @@ void MainWindow::initializeNewQuiz(){
 
     gridLayout->addWidget(scrollArea);
 
+    quizLayout->addWidget(verticalLayoutWidget);
+    quizLayout->addWidget(gridLayoutWidget);
+
+    masterLayout->addWidget(quizLayoutWidget);
+
     //Connect signals and slots for buttons
     connect(createEditQuizButton, SIGNAL (released()), this, SLOT (createEditQuizButton_clicked()));
     connect(saveQuizButton, SIGNAL (released()), this, SLOT (saveQuizButton_clicked()));
@@ -455,8 +499,8 @@ void MainWindow::initializeNewQuiz(){
 
 void MainWindow::cardUpdater(Card newCard){
     QuizCard *quizCard = new QuizCard(newCard, selectedCards);
-    quizCard->setMinimumHeight(250);
-    quizCard->setMinimumWidth(425);
+    quizCard->setMinimumHeight(150);
+    quizCard->setMinimumWidth(300);
     quizCard->setMaximumHeight(250);
     quizCard->setMaximumWidth(425);
     QPixmap *cardImg = new QPixmap(*pix1);
@@ -481,11 +525,15 @@ void MainWindow::cardDisplayer(){
 }
 
 void MainWindow::on_newQuizButton_clicked(){
-    backButton->show();
     showMakeQuizMenu();
 }
 
 void MainWindow::initializeNewCard(){
+    //Create widget and layout to add the masterLayout
+    newCardWidget = new QWidget();
+    newCardLayout = new QGridLayout(newCardWidget);
+    newCardLayout->setAlignment(Qt::AlignCenter);
+
     englishText = new MyTextEdit;
     pinyinText = new MyTextEdit;
     chineseText = new MyTextEdit;
@@ -499,39 +547,25 @@ void MainWindow::initializeNewCard(){
     chineseText->setText(chineseText->getDefaultText());
 
     newCardList = {englishText, pinyinText, chineseText};
-    int curY = 410;
+    int i = 0;
     for(auto text: newCardList){
-        text->setFixedHeight(buttonHeight);
-        text->setFixedWidth(2 * buttonWidth);
+        text->setMaximumHeight(buttonHeight);
+        text->setMaximumWidth(2 * buttonWidth);
+        text->setMinimumHeight(buttonHeight);
+        text->setMinimumWidth(buttonWidth);
         text->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         text->setFont(*buttonFont);
-        text->move(210 + 450, curY);
-        text->setParent(this);
-        text->hide();
-        curY += buttonHeight * 2 + 30;
+        newCardLayout->addWidget(text, i + 4, 1);
+        i++;
     }
 
     acceptNewCardButton = new HoverButton;
-
-    acceptNewCardButton->setFixedWidth(buttonWidth);
-    acceptNewCardButton->setFixedHeight(buttonHeight);
+    acceptNewCardButton->setMaximumWidth(buttonWidth);
+    acceptNewCardButton->setMaximumHeight(buttonHeight);
     acceptNewCardButton->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
     acceptNewCardButton->setFont(*buttonFont);
-    acceptNewCardButton->move(210 + 750 + buttonWidth , 85);
-    acceptNewCardButton->setParent(this);
     acceptNewCardButton->setText("Accept");
-    acceptNewCardButton->hide();
-
-    notificationLabel = new QLabel();
-    notificationLabel->setText("Card was successfully created!");
-    notificationLabel->setFont(*titleFont);
-    notificationLabel->setMinimumWidth(this->width());
-    notificationLabel->setMaximumHeight(buttonHeight + 25);
-    notificationLabel->setStyleSheet("background-color: rgba(255, 255, 255, 100);");
-    notificationLabel->move(this->width()/2 - notificationLabel->width()/2 + 25, this->height()/2  - notificationLabel->height()/2 - 235);
-    notificationLabel->setParent(this);
-    notificationLabel->setAlignment(Qt::AlignCenter);
-    notificationLabel->hide();
+    newCardLayout->addWidget(acceptNewCardButton, 0, 7);
 
     tone0Button = new HoverButton;
     tone1Button = new HoverButton;
@@ -547,18 +581,25 @@ void MainWindow::initializeNewCard(){
     tone3Button->setText("3");
     tone4Button->setText("4");
 
-    pinyinButtonFont->setPointSize(12);
-    int curX = 210 + 800 + buttonWidth;
+
+    //int curX = 210 + 800 + buttonWidth;
+    i = 0;
     for(auto button: pinButtonList){
-        button->setFixedWidth(buttonWidth/9);
-        button->setFixedHeight(buttonHeight);
+        button->setMaximumWidth(buttonWidth/9);
+        button->setMaximumHeight(buttonHeight);
         button->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         button->setFont(*pinyinButtonFont);
-        button->move(curX + 10, 410 + buttonHeight * 2 + 30);
-        button->setParent(this);
-        button->hide();
-        curX += buttonWidth/9;
+        newCardLayout->addWidget(button, 5, 2 + i);
+        i++;
     }
+
+    newCardLayout->setHorizontalSpacing(50);
+    newCardLayout->setVerticalSpacing(225);
+
+    qDebug() << "Almost done initing new card menu";
+    newCardLayout->setColumnStretch(1, 10);
+
+    masterLayout->addWidget(newCardWidget);
 
     connect(acceptNewCardButton, SIGNAL (released()), this, SLOT (on_acceptNewCardButton_clicked()));
     connect(tone0Button, SIGNAL (released()), this, SLOT (on_tone0Button_clicked()));
@@ -566,24 +607,30 @@ void MainWindow::initializeNewCard(){
     connect(tone2Button, SIGNAL (released()), this, SLOT (on_tone2Button_clicked()));
     connect(tone3Button, SIGNAL (released()), this, SLOT (on_tone3Button_clicked()));
     connect(tone4Button, SIGNAL (released()), this, SLOT (on_tone4Button_clicked()));
+
+    qDebug() << "Done initing new card menu";
+
 }
 
 void MainWindow::initializeBackButton(){
     backButton = new HoverButton();
-    backButton->setFixedWidth(buttonWidth);
-    backButton->setFixedHeight(buttonHeight);
+    backButton->setMaximumWidth(buttonWidth);
+    backButton->setMaximumHeight(buttonHeight);
     backButton->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
     backButton->setFont(*buttonFont);
-    backButton->move(350 , 85);
-    backButton->setParent(this);
+    //backButton->move(350 , 85);
+    //backButton->setParent(this);
     backButton->setText("Back");
-    backButton->hide();
+    //backButton->hide();
     connect(backButton, SIGNAL (released()), this, SLOT (on_backButton_clicked()));
 }
 
 void MainWindow::initializeMenuButtons(){
     QSizePolicy labelPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::Label);
     QSizePolicy buttonPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::PushButton);
+
+    mainMenuWidget = new QWidget();
+    mainMenuLayout = new QVBoxLayout(mainMenuWidget);
 
     titleLabel = new QLabel();
     newCardButton = new HoverButton();
@@ -609,26 +656,34 @@ void MainWindow::initializeMenuButtons(){
 
     int curY = 145;
 
-    titleFont->setPointSize(50);
-    buttonFont->setPointSize(25);
-
     titleLabel->setMaximumWidth(buttonWidth * 2);
     titleLabel->setMaximumHeight(buttonHeight * 2);
     titleLabel->setFont(*titleFont);
     titleLabel->move(960 - 250/2, 0);
-    titleLabel->setParent(this);
+    mainMenuLayout->addWidget(titleLabel);
+
+    auto vSpacer1 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    mainMenuLayout->addItem(vSpacer1);
 
     for(auto button: buttonList){
-        button->setAttribute(Qt::WA_Hover, true);
         button->setMaximumWidth(buttonWidth);
         button->setMaximumHeight(buttonHeight);
         button->setSizePolicy(buttonPolicy);
         button->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         button->setFont(*buttonFont);
-        button->move(960 - 350/2 , curY);
-        button->setParent(this);
+        mainMenuLayout->addWidget(button);
+        auto vSpacer2 = new QSpacerItem(20, 100, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        mainMenuLayout->addItem(vSpacer2);
+        //dummy label for articificial minimum spacing
+        QLabel* dummy = new QLabel();
+        dummy->setFixedSize(25,25);
+        mainMenuLayout->addWidget(dummy);
         curY += buttonHeight * 2 + 30;
     }
+
+    //add main menu layout to masterLayout
+    masterLayout->addWidget(mainMenuWidget);
+    mainMenuLayout->setAlignment(Qt::AlignCenter);
 
     connect(newCardButton, SIGNAL (released()), this, SLOT (on_newCardButton_clicked()));
     connect(newQuizButton, SIGNAL (released()), this, SLOT (on_newQuizButton_clicked()));
@@ -739,6 +794,7 @@ bool MainWindow::loadProfile(){
 
 
 void MainWindow::hideNewCard(){
+    /*
     backButton->hide();
     acceptNewCardButton->hide();
 
@@ -754,18 +810,21 @@ void MainWindow::hideNewCard(){
         pinButton->hide();
     }
     notificationLabel->hide();
+    */
+    masterLayout->widget(1)->hide();
+    masterLayout->widget(0)->show();
 }
 
 void MainWindow::showMakeQuizMenu(){
     //Hide main menu
-    hideMenu();
+    //hideMenu();
 
     //Reset default background
-    backGround->setPixmap(*new QPixmap());
+    //backGround->setPixmap(*new QPixmap());
 
     //add back button
     verticalLayout->insertWidget(1, backButton);
-    backButton->show();
+    //backButton->show();
 
     viewport = new QWidget;
     viewport->setLayout(inner);
@@ -779,6 +838,7 @@ void MainWindow::showMakeQuizMenu(){
     gridLayout->addWidget(scrollArea);
 
     //Display the quiz editor menu
+    /*
     verticalLayoutWidget->show();
     quizTextEdit->show();
     createEditQuizButton->show();
@@ -788,7 +848,9 @@ void MainWindow::showMakeQuizMenu(){
     deleteSelectedCardsButton->show();
     viewport->show();
     gridLayoutWidget->show();
-
+*/
+    this->setPalette(QPalette());
+    masterLayout->setCurrentWidget(quizLayoutWidget);
 }
 
 void MainWindow::hideQuizMenu(){
@@ -810,25 +872,17 @@ void MainWindow::hideQuizMenu(){
 }
 
 void MainWindow::showNewCard(){
-    acceptNewCardButton->show();
-    for(auto text: newCardList){
-        text->show();
-    }
-    for(auto button: pinButtonList){
-        button->show();
-    }
-    notificationLabel->setStyleSheet("background-color: rgba(0,0,0,0%)");
+    newCardLayout->addWidget(backButton, 0, 0);
+    masterLayout->setCurrentWidget(newCardWidget);
 }
 
+//deprecating hide functions
 void MainWindow::hideMenu(){
-    titleLabel->hide();
-    for(auto card : buttonList){
-        card->hide();
-    }
-    backButton->show();
+    //masterLayout->widget(0)->hide();
 }
 
 void MainWindow::showMenu(){
+    /*
     backButton->hide();
     backGround->setPixmap(*pix1);
     titleLabel->show();
@@ -836,6 +890,8 @@ void MainWindow::showMenu(){
     for(auto card: buttonList){
         card->show();
     }
+*/
+    //masterLayout->widget(0)->show();
 }
 
 void MainWindow::fireAnimation(){
@@ -1083,10 +1139,70 @@ void MainWindow::deleteSelectedCardsButton_clicked(){
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event){
-    if(event){
-        *pix1 = pix1->scaled(this->height(), this->width(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-        backGround->setPixmap(*pix1);
+
+    //qDebug() << this->height() << ", " <<this->width();
+    float ratio = (float)this->height()/(float)this->width();
+    //bool growingHeight = prevHeight < this->height();
+    //bool growingWidth = prevWidth < this->width();
+
+    prevHeight = this->height();
+    prevWidth = this->width();
+/*
+    if(growingHeight && !growingWidth)
+        qDebug() << "Height growing";
+    else if(growingWidth && !growingHeight){
+        qDebug() << "Width growing";
+    }else if(growingWidth && growingHeight){
+        qDebug() << "Both growing";
+    }else{
+        qDebug() << "shrinking";
     }
-    //QWidget::resizeEvent(event);
+
+    prevHeight = this->height();
+    prevWidth = this->width();
+
+    if(ratio < 9/16.0 && !growingHeight){
+        this->setGeometry(QRect(100,100, this->width(), this->height() - 1));
+        qDebug() << "Too wide";
+    }
+
+    else if(ratio > 9/16.0 && !growingHeight && !growingWidth){
+        this->setGeometry(QRect(100,100, this->width() - 1, this->height()));
+        qDebug() << "Too tall";
+    }
+
+    else if(ratio < 9/16.0 && growingHeight){
+        this->setGeometry(QRect(100,100, this->width(), this->height() + 1));
+        qDebug() << "Too wide";
+    }
+
+    else if(ratio > 9/16.0 && !growingHeight && !growingWidth){
+        this->setGeometry(QRect(100,100, this->width() + 1, this->height()));
+        qDebug() << "Too tall";
+    }
+*/
+    if(ratio == 9/16.0){
+        auto size = this->size();
+        auto pixNew = pix1->scaled(size.width(), size.height(), Qt::KeepAspectRatio, Qt::FastTransformation);
+        QPalette palette;
+        palette.setBrush(QPalette::Background, pixNew);
+        this->setPalette(palette);
+    }
+    //update();
+/*
+    if(event){
+        qDebug() << resized;
+        resized++;
+        auto size = this->size();
+        *pix1 = pix1->scaled(size.height(), size.width(), Qt::KeepAspectRatio, Qt::FastTransformation);
+        QPalette palette;
+        palette.setBrush(QPalette::Background, *pix1);
+        this->setPalette(palette);
+        qDebug() << backGround->height() << ", " << backGround->width();
+        update();
+    }
+*/
+
+    QWidget::resizeEvent(event);
 }
 
