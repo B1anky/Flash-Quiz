@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->centralWidget()->setLayout(masterLayout);
     masterLayout->setCurrentWidget(mainMenuWidget);
     //masterLayout->widget(0)->show();
-    //this->setWindowState(Qt::WindowMaximized);
+    this->setWindowState(Qt::WindowMaximized);
 
     //showNewCard();
 }
@@ -534,6 +534,26 @@ void MainWindow::initializeNewCard(){
     newCardLayout = new QGridLayout(newCardWidget);
     newCardLayout->setAlignment(Qt::AlignCenter);
 
+
+    //Add accept button to top left of grid layout
+    acceptNewCardButton = new HoverButton;
+    acceptNewCardButton->setMaximumWidth(buttonWidth);
+    acceptNewCardButton->setMaximumHeight(buttonHeight);
+    acceptNewCardButton->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
+    acceptNewCardButton->setFont(*buttonFont);
+    acceptNewCardButton->setText("Accept");
+    newCardLayout->addWidget(acceptNewCardButton, 0, 7);
+
+
+    //Add empty labels to the grid layout to push space between the top row and text edits
+
+    for(int i = 1; i < 4; i++){
+       QPushButton* spacer = new QPushButton();
+       spacer->setMaximumHeight(buttonHeight);
+       spacer->setMaximumWidth(buttonWidth);
+       newCardLayout->addWidget(spacer, i, 1);
+    }
+
     englishText = new MyTextEdit;
     pinyinText = new MyTextEdit;
     chineseText = new MyTextEdit;
@@ -546,26 +566,24 @@ void MainWindow::initializeNewCard(){
     pinyinText->setText(pinyinText->getDefaultText());
     chineseText->setText(chineseText->getDefaultText());
 
+    //Add the text edits to the grid layout
     newCardList = {englishText, pinyinText, chineseText};
     int i = 0;
     for(auto text: newCardList){
+        QPushButton* spacer = new QPushButton();
+        spacer->setMaximumHeight(buttonHeight);
+        spacer->setMaximumWidth(buttonWidth);
         text->setMaximumHeight(buttonHeight);
         text->setMaximumWidth(2 * buttonWidth);
         text->setMinimumHeight(buttonHeight);
         text->setMinimumWidth(buttonWidth);
         text->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         text->setFont(*buttonFont);
-        newCardLayout->addWidget(text, i + 4, 1);
-        i++;
+        newCardLayout->addWidget(text, i + 10, 1);
+        newCardLayout->addWidget(spacer, i + 11, 1);
+        i+=2;
     }
 
-    acceptNewCardButton = new HoverButton;
-    acceptNewCardButton->setMaximumWidth(buttonWidth);
-    acceptNewCardButton->setMaximumHeight(buttonHeight);
-    acceptNewCardButton->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
-    acceptNewCardButton->setFont(*buttonFont);
-    acceptNewCardButton->setText("Accept");
-    newCardLayout->addWidget(acceptNewCardButton, 0, 7);
 
     tone0Button = new HoverButton;
     tone1Button = new HoverButton;
@@ -589,15 +607,15 @@ void MainWindow::initializeNewCard(){
         button->setMaximumHeight(buttonHeight);
         button->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         button->setFont(*pinyinButtonFont);
-        newCardLayout->addWidget(button, 5, 2 + i);
+        newCardLayout->addWidget(button, 12, 2 + i);
         i++;
     }
 
     newCardLayout->setHorizontalSpacing(50);
-    newCardLayout->setVerticalSpacing(225);
+    //newCardLayout->setVerticalSpacing(45);
 
     qDebug() << "Almost done initing new card menu";
-    newCardLayout->setColumnStretch(1, 10);
+    newCardLayout->setColumnStretch(1, 20);
 
     masterLayout->addWidget(newCardWidget);
 
@@ -640,8 +658,9 @@ void MainWindow::initializeMenuButtons(){
     randomAllButton = new HoverButton();
     lightningQuizButton = new HoverButton();
     statisticsButton = new HoverButton();
+    optionsButton = new HoverButton();
 
-    buttonList = {newCardButton, newQuizButton, loadProfileButton, quizSelectButton, randomAllButton, lightningQuizButton, statisticsButton};
+    buttonList = {newCardButton, newQuizButton, loadProfileButton, quizSelectButton, randomAllButton, lightningQuizButton, statisticsButton, optionsButton};
 
     if(languageEnglish == true){
         titleLabel->setText("Flash Quiz");
@@ -652,33 +671,31 @@ void MainWindow::initializeMenuButtons(){
         randomAllButton->setText("Random All Test");
         lightningQuizButton->setText("Lightning Quiz");
         statisticsButton->setText("Statistics");
+        optionsButton->setText("Options");
     }
 
-    int curY = 145;
+    auto titleSpacer = new QSpacerItem(20, 50, QSizePolicy::Fixed);
+    mainMenuLayout->addItem(titleSpacer);
 
     titleLabel->setMaximumWidth(buttonWidth * 2);
     titleLabel->setMaximumHeight(buttonHeight * 2);
     titleLabel->setFont(*titleFont);
-    titleLabel->move(960 - 250/2, 0);
+    //titleLabel->move(960 - 250/2, 0);
     mainMenuLayout->addWidget(titleLabel);
 
-    auto vSpacer1 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    auto vSpacer1 = new QSpacerItem(20, 140, QSizePolicy::Fixed);
     mainMenuLayout->addItem(vSpacer1);
+
 
     for(auto button: buttonList){
         button->setMaximumWidth(buttonWidth);
         button->setMaximumHeight(buttonHeight);
-        button->setSizePolicy(buttonPolicy);
+        //button->setSizePolicy(buttonPolicy);
         button->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         button->setFont(*buttonFont);
         mainMenuLayout->addWidget(button);
-        auto vSpacer2 = new QSpacerItem(20, 100, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        auto vSpacer2 = new QSpacerItem(10, 36.5, QSizePolicy::Fixed);
         mainMenuLayout->addItem(vSpacer2);
-        //dummy label for articificial minimum spacing
-        QLabel* dummy = new QLabel();
-        dummy->setFixedSize(25,25);
-        mainMenuLayout->addWidget(dummy);
-        curY += buttonHeight * 2 + 30;
     }
 
     //add main menu layout to masterLayout

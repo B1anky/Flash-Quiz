@@ -100,8 +100,10 @@ private:
     HoverButton* randomAllButton;
     HoverButton* lightningQuizButton;
     HoverButton* statisticsButton;
+    HoverButton* optionsButton;
     QPixmap* pix1;
     QHBoxLayout *backGroundLayout;
+
 
     //QObject for every screen's back button
     HoverButton* backButton;
