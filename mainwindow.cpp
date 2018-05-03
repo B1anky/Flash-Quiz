@@ -59,23 +59,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     initializeMenuButtons();
     initializeBackButton();
     initializeNewCard();
-
     initializeNewQuiz();
+    initializeQuizSelect();
 
-    //hideQuizMenu();
-    //showMenu();
-
-
-
-
-    prevHeight = this->height();
-    prevWidth = this->width();
     this->centralWidget()->setLayout(masterLayout);
     masterLayout->setCurrentWidget(mainMenuWidget);
-    //masterLayout->widget(0)->show();
     this->setWindowState(Qt::WindowMaximized);
-
-    //showNewCard();
 }
 
 MainWindow::~MainWindow()
@@ -88,6 +77,10 @@ void MainWindow::on_newCardButton_clicked(){
     hideMenu();
     //Show the new card menu
     showNewCard();
+}
+
+void MainWindow::on_optionsButton_clicked(){
+
 }
 
 void MainWindow::applyTone(int toneNum){
@@ -343,10 +336,6 @@ void MainWindow::on_hideNotificationLabel(){
 }
 
 
-void MainWindow::on_quizSelectButton_clicked(){
-
-}
-
 void MainWindow::on_randomAllButton_clicked(){
 
 }
@@ -526,6 +515,48 @@ void MainWindow::cardDisplayer(){
 
 void MainWindow::on_newQuizButton_clicked(){
     showMakeQuizMenu();
+}
+
+void MainWindow::initializeQuizSelect(){
+    quizSelectWidget = new QWidget();
+    quizSelectLayout = new QGridLayout(quizSelectWidget);
+    quizSelectLayout->setAlignment(Qt::AlignCenter);
+
+    verticalQuizSelectLayoutWidget = new QWidget();
+    verticalQuizSelectLayoutWidget->setObjectName(QStringLiteral("QuizSelectLayoutWidget"));
+    verticalQuizSelectLayoutWidget->setGeometry(QRect(10,0,951,1021));
+    verticalQuizSelectLayout = new QVBoxLayout(quizLayoutWidget);
+    verticalQuizSelectLayout->setObjectName(QStringLiteral("quizSelectLayout"));
+    verticalQuizSelectLayout->setContentsMargins(0,0,0,0);
+    verticalQuizSelectSpacer_9 = new QSpacerItem(20,40,QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalQuizSelectSpacer_5 = new QSpacerItem(20,40,QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalQuizSelectLayout->addItem(verticalQuizSelectSpacer_9);
+    verticalQuizSelectLayout->addItem(verticalQuizSelectSpacer_5);
+
+    quizSelectScrollViewer = new QGridLayout();
+    quizViewport = new QWidget;
+    quizViewport->setLayout(inner);
+
+        //Add the viewport to the scroll area
+    qscrollArea = new QScrollArea;
+    qscrollArea->setWidget(quizViewport);
+
+    gridLayout->addWidget(qscrollArea);
+
+    quizSelectLayout->addWidget(verticalQuizSelectLayoutWidget);
+    quizSelectLayout->addWidget(gridLayoutWidget);
+
+    masterLayout->addWidget(quizSelectWidget);
+}
+
+void MainWindow::quizDisplayer(){
+    for(int i = 0; i < quizList.size(); i++){
+        HoverButton *button = new HoverButton();
+        button->setText(quizList[i].first);
+        quizSelectScrollViewer->addWidget(button);
+        qDebug() << quizList[i].first;
+        qDebug() << "Hello";
+    }
 }
 
 void MainWindow::initializeNewCard(){
@@ -709,6 +740,7 @@ void MainWindow::initializeMenuButtons(){
     connect(randomAllButton, SIGNAL (released()), this, SLOT (on_randomAllButton_clicked()));
     connect(lightningQuizButton, SIGNAL (released()), this, SLOT (on_lightningQuizButton_clicked()));
     connect(statisticsButton, SIGNAL (released()), this, SLOT (on_statisticsButton_clicked()));
+    connect(optionsButton, SIGNAL (released()), this, SLOT (on_optionsButton_clicked()));
 }
 
 void MainWindow::on_loadProfileButton_clicked(){
@@ -722,6 +754,16 @@ void MainWindow::on_loadProfileButton_clicked(){
         }
         //initializeNewQuiz();
     }
+    quizDisplayer();
+}
+
+void MainWindow::on_quizSelectButton_clicked(){
+    showQuizSelect();
+}
+
+void MainWindow::showQuizSelect(){
+    quizSelectLayout->addWidget(backButton, 0, 0);
+    masterLayout->setCurrentWidget(quizSelectWidget);
 }
 
 bool MainWindow::loadProfile(){
@@ -828,8 +870,8 @@ void MainWindow::hideNewCard(){
     }
     notificationLabel->hide();
     */
-    masterLayout->widget(1)->hide();
-    masterLayout->widget(0)->show();
+    //masterLayout->widget(1)->hide();
+    //masterLayout->widget(0)->show();
 }
 
 void MainWindow::showMakeQuizMenu(){

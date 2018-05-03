@@ -53,6 +53,7 @@ private:
     void initializeQuizCreatorBackButton();
     void initializeNewCard();
     void initializeNewQuiz();
+    void initializeQuizSelect();
     void hideMenu();
     void showMenu();
     void showNewCard();
@@ -63,6 +64,7 @@ private:
     void cardDisplayer();
     void fireAnimation();
     void resizeEvent(QResizeEvent* event);
+    void showQuizSelect();
 
 
     int resized = 0;
@@ -79,6 +81,9 @@ private:
 
     QWidget* quizLayoutWidget;
     QHBoxLayout* quizLayout;
+
+    QWidget *quizSelectWidget;
+    QGridLayout *quizSelectLayout;
 
     QVector<HoverButton*> buttonList;
     QVector<MyTextEdit*> newCardList;
@@ -123,8 +128,15 @@ private:
 
     //QObjects for new / Edit Quiz
     QGridLayout *inner;
+    QGridLayout *quizSelectScrollViewer;
     QWidget *viewport;
     QScrollArea *scrollArea;
+    QWidget *verticalQuizSelectLayoutWidget;
+    QVBoxLayout *verticalQuizSelectLayout;
+    QSpacerItem *verticalQuizSelectSpacer_9;
+    QSpacerItem *verticalQuizSelectSpacer_5;
+    QWidget *quizViewport;
+    QScrollArea *qscrollArea;
 
     QWidget *quizWidget;
     QWidget *verticalLayoutWidget;
@@ -173,6 +185,7 @@ private slots:
     void on_randomAllButton_clicked();
     void on_lightningQuizButton_clicked();
     void on_statisticsButton_clicked();
+    void on_optionsButton_clicked();
 
     void on_backButton_clicked();
     void resetFlashCardPalette();
@@ -184,6 +197,7 @@ private slots:
     void on_tone3Button_clicked();
     void on_tone4Button_clicked();
     void on_hideNotificationLabel();
+    void quizDisplayer();
 
     void cardUpdater(Card newCard);
     void createEditQuizButton_clicked();
