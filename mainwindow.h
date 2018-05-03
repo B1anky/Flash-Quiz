@@ -44,15 +44,19 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     bool languageEnglish;
-    virtual int heightForWidth ( int w ) const { return w*9/16;};
 private:
 
     void initializeMenuButtons();
     bool loadProfile();
+    void initializeExitAndMinimize();
+    void initializeNotificationLabel();
+    void initializeFonts();
+    void initializeFlashCard();
     void initializeBackButton();
     void initializeQuizCreatorBackButton();
     void initializeNewCard();
     void initializeNewQuiz();
+    void initializeOptions();
     void hideMenu();
     void showMenu();
     void showNewCard();
@@ -65,7 +69,8 @@ private:
     void resizeEvent(QResizeEvent* event);
 
 
-    int resized = 0;
+    int scale = 1;
+
 
     QStackedLayout* masterLayout;
     QLabel* backGround;
@@ -75,13 +80,15 @@ private:
     QVBoxLayout *mainMenuLayout;
 
     QWidget* newCardWidget;
-    QGridLayout* newCardLayout;
+    //QGridLayout* newCardLayout;
 
-    QWidget* quizLayoutWidget;
-    QHBoxLayout* quizLayout;
+    QWidget* quizCreateWidget;
+    QHBoxLayout* quizCreateLayout;
+
+    QWidget* optionsWidget;
 
     QVector<HoverButton*> buttonList;
-    QVector<MyTextEdit*> newCardList;
+    QVector<MyTextEdit*> newCardTextEditList;
     QVector<HoverButton*> pinButtonList;
     QVector<Card*> userCards;
     QVector<Card*> selectedCards;
@@ -90,6 +97,18 @@ private:
 
     //Current profile's name
     QString profileName = "Guest";
+
+    //QObjects for Exit and minimize
+    HoverButton* exit;
+    HoverButton* minimize;
+
+    //QObjects for options
+    HoverButton* x1366x768;
+    HoverButton* x1920x1080;
+    QVector<QPair<int, int>> resolutions;
+    QVector<HoverButton*> resolutionButtonList;
+    int xRatio = 1;
+    int yRatio = 1;
 
     //QObjects for main menu
     QLabel* titleLabel;
@@ -100,8 +119,10 @@ private:
     HoverButton* randomAllButton;
     HoverButton* lightningQuizButton;
     HoverButton* statisticsButton;
+    HoverButton* optionsButton;
     QPixmap* pix1;
     QHBoxLayout *backGroundLayout;
+
 
     //QObject for every screen's back button
     HoverButton* backButton;
@@ -127,26 +148,17 @@ private:
     QWidget *quizWidget;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
-    QSpacerItem *horizontalSpacer_1;
-    QSpacerItem *verticalSpacer_5;
-    DropDownTextEdit *quizTextEdit;
-    QSpacerItem *verticalSpacer_6;
-    QSpacerItem *verticalSpacer;
-    HoverButton *createEditQuizButton;
-    QSpacerItem *verticalSpacer_2;
-    HoverButton *saveQuizButton;
-    QSpacerItem *verticalSpacer_4;
-    HoverButton *loadQuizButton;
-    QSpacerItem *verticalSpacer_7;
-    HoverButton *deleteQuizButton;
-    QSpacerItem *verticalSpacer_3;
-    HoverButton *deleteSelectedCardsButton;
-    QSpacerItem *verticalSpacer_8;
-    QSpacerItem *verticalSpacer_9;
-    QWidget *gridLayoutWidget;
-    QGridLayout *gridLayout;
-    QMenuBar *menubar;
-    QStatusBar *statusbar;
+
+    QSpacerItem* verticalSpacer_5;
+    DropDownTextEdit* quizTextEdit;
+    HoverButton* createEditQuizButton;
+    HoverButton* saveQuizButton;
+    HoverButton* loadQuizButton;
+    HoverButton* deleteQuizButton;
+    HoverButton* deleteSelectedCardsButton;
+    QVector<HoverButton*> quizCreateMenuButtonList;
+    QWidget* gridLayoutWidget;
+    QGridLayout* gridLayout;
 
     //Fonts
     QFont* titleFont = new QFont();
@@ -154,6 +166,7 @@ private:
     QFont* cardFont = new QFont();
     QFont* pinyinButtonFont = new QFont();
     QFont* textEditFont = new QFont();
+    QFont* exitAndMinimizeFont = new QFont();
 
 
     //Default widget heights/ widths
@@ -164,6 +177,8 @@ private:
     int prevWidth;
 
 private slots:
+    void exitClicked();
+    void minimizeClicked();
     void on_newCardButton_clicked();
     void on_newQuizButton_clicked();
     void on_loadProfileButton_clicked();
@@ -171,6 +186,7 @@ private slots:
     void on_randomAllButton_clicked();
     void on_lightningQuizButton_clicked();
     void on_statisticsButton_clicked();
+    void on_optionsButton_clicked();
 
     void on_backButton_clicked();
     void resetFlashCardPalette();

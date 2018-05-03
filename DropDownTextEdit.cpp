@@ -1,5 +1,9 @@
 #include "DropDownTextEdit.h"
 
+DropDownTextEdit::DropDownTextEdit(QLineEdit*){
+
+}
+
 DropDownTextEdit::DropDownTextEdit(QVector<QPair<QString, QVector<Card*>*>> quizListIn){
     updateCompleter(quizListIn);
 }

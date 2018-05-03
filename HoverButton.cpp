@@ -15,7 +15,7 @@ void HoverButton::leaveEvent(QHoverEvent *e){
 }
 
 void HoverButton::hoverEnter(QHoverEvent *event){
-     this->setStyleSheet("background-color: rgba(255, 255, 255, 25); border: 2px solid black");
+     this->setStyleSheet("background-color: rgba(0, 0, 0); color: white");
 }
 
 void HoverButton::hoverLeave(QHoverEvent *event){
