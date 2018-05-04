@@ -165,6 +165,14 @@ private:
     QVector<HoverButton*> quizCreateMenuButtonList;
     QWidget* gridLayoutWidget;
     QGridLayout* gridLayout;
+    
+    QWidget *quizSelectWidget;
+    QGridLayout *quizSelectLayout;
+    QWidget *verticalQuizSelectLayoutWidget;
+    QVBoxLayout *verticalQuizSelectLayout;
+    QSpacerItem *verticalQuizSelectSpacer_9;
+    QSpacerItem *verticalQuizSelectSpacer_5;
+    QGridLayout *quizSelectScrollViewer;
 
     //Fonts
     QFont* titleFont = new QFont();
@@ -180,6 +188,8 @@ private:
     int buttonWidth = 350 * widthRatio;
 
 private slots:
+    void showQuizSelect();
+    void initializeQuizSelect();
     void exitClicked();
     void minimizeClicked();
     void newCardButtonClicked();
