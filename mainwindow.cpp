@@ -145,31 +145,30 @@ void MainWindow::initializeQuizSelect(){
     quizSelectWidget = new QWidget();
     quizSelectLayout = new QGridLayout(quizSelectWidget);
     quizSelectLayout->setAlignment(Qt::AlignCenter);
-
-    verticalQuizSelectLayoutWidget = new QWidget();
-    verticalQuizSelectLayoutWidget->setObjectName(QStringLiteral("QuizSelectLayoutWidget"));
-    verticalQuizSelectLayoutWidget->setGeometry(QRect(10,0,951,1021));
-    verticalQuizSelectLayout = new QVBoxLayout(quizLayoutWidget);
-    verticalQuizSelectLayout->setObjectName(QStringLiteral("quizSelectLayout"));
-    verticalQuizSelectLayout->setContentsMargins(0,0,0,0);
-    verticalQuizSelectSpacer_9 = new QSpacerItem(20,40,QSizePolicy::Minimum, QSizePolicy::Expanding);
-    verticalQuizSelectSpacer_5 = new QSpacerItem(20,40,QSizePolicy::Minimum, QSizePolicy::Expanding);
-    verticalQuizSelectLayout->addItem(verticalQuizSelectSpacer_9);
-    verticalQuizSelectLayout->addItem(verticalQuizSelectSpacer_5);
-
-    quizSelectScrollViewer = new QGridLayout();
-    quizViewport = new QWidget;
-    quizViewport->setLayout(inner);
-
-        //Add the viewport to the scroll area
+    qDebug() << "a";
+    quizGridLayoutWidget = new QWidget();
+    quizGridLayout = new QGridLayout(quizGridLayoutWidget);
+    quizInner = new QGridLayout();
+    quizViewport = new QWidget();
+    quizViewport->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
+    quizViewport->setLayout(quizInner);
     qscrollArea = new QScrollArea;
     qscrollArea->setWidget(quizViewport);
+    quizGridLayout->addWidget(qscrollArea);
+    quizSelectLayout->addWidget(qscrollArea);
+    quizGridLayout->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
+    qDebug() << "B";
+    verticalQuizSelectLayoutWidget = new QWidget();
+    verticalQuizSelectLayout = new QVBoxLayout(verticalQuizSelectLayoutWidget);
+    verticalQuizSelectLayoutWidget->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
+    verticalQuizSelectLayoutWidget->setParent(quizSelectWidget);
+    quizGridLayout->setParent(quizSelectWidget);
+    qDebug() << "C";
 
-    gridLayout->addWidget(qscrollArea);
-
-    quizSelectLayout->addWidget(verticalQuizSelectLayoutWidget);
-    quizSelectLayout->addWidget(gridLayoutWidget);
-
+        //Add the viewport to the scroll area
+    //quizSelectLayout->addWidget(verticalQuizSelectLayoutWidget);
+    //quizSelectLayout->addWidget(quizSelectWidget);
+qDebug() <<"D";
     masterLayout->addWidget(quizSelectWidget);
 }
 

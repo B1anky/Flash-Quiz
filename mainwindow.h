@@ -165,7 +165,12 @@ private:
     QVector<HoverButton*> quizCreateMenuButtonList;
     QWidget* gridLayoutWidget;
     QGridLayout* gridLayout;
-    
+    QWidget * quizViewport;
+    QScrollArea *qscrollArea ;
+    QGridLayout *quizInner;
+    QWidget *quizGridLayoutWidget;
+    QGridLayout *quizGridLayout;
+
     QWidget *quizSelectWidget;
     QGridLayout *quizSelectLayout;
     QWidget *verticalQuizSelectLayoutWidget;
