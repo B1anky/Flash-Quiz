@@ -4,8 +4,8 @@
 #include "Card.h"
 #include "MyTextEdit.h"
 #include "QuizCard.h"
-#include "QuizEditor.h"
 #include "HoverButton.h"
+#include <DragBarLabel.h>
 #include <MyInputDialog.h>
 #include <DropDownTextEdit.h>
 #include <QMainWindow>
@@ -32,6 +32,7 @@
 #include <QStackedLayout>
 
 
+
 namespace Ui {
 class MainWindow;
 }
@@ -48,6 +49,7 @@ private:
 
     void initializeMenuButtons();
     bool loadProfile();
+    void initializeDragBar();
     void initializeExitAndMinimize();
     void initializeNotificationLabel();
     void initializeFonts();
@@ -66,11 +68,15 @@ private:
     void hideQuizMenu();
     void cardDisplayer();
     void fireAnimation();
-    void resizeEvent(QResizeEvent* event);
+    void reinitializeAll();
 
+    //If starting at 1920 x 1080
+    //float heightRatio = 1;
+    //float widthRatio = 1;
 
-    int scale = 1;
-
+    //If starting at 1366 x 740
+    float heightRatio = .7114583333;
+    float widthRatio = .71111111;
 
     QStackedLayout* masterLayout;
     QLabel* backGround;
@@ -98,17 +104,18 @@ private:
     //Current profile's name
     QString profileName = "Guest";
 
+    //Qlabel that will be the drag bar on top
+    DragBarLabel* dragBarLabel;
+
     //QObjects for Exit and minimize
     HoverButton* exit;
     HoverButton* minimize;
 
     //QObjects for options
-    HoverButton* x1366x768;
-    HoverButton* x1920x1080;
-    QVector<QPair<int, int>> resolutions;
+    HoverButton* x1366x740;
+    HoverButton* x1920x1040;
+    QVector<int> resolutionCompareList;
     QVector<HoverButton*> resolutionButtonList;
-    int xRatio = 1;
-    int yRatio = 1;
 
     //QObjects for main menu
     QLabel* titleLabel;
@@ -149,7 +156,6 @@ private:
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
 
-    QSpacerItem* verticalSpacer_5;
     DropDownTextEdit* quizTextEdit;
     HoverButton* createEditQuizButton;
     HoverButton* saveQuizButton;
@@ -170,34 +176,31 @@ private:
 
 
     //Default widget heights/ widths
-    int buttonHeight = 50;
-    int buttonWidth = 350;
-
-    int prevHeight;
-    int prevWidth;
+    int buttonHeight = 50 * heightRatio;
+    int buttonWidth = 350 * widthRatio;
 
 private slots:
     void exitClicked();
     void minimizeClicked();
-    void on_newCardButton_clicked();
-    void on_newQuizButton_clicked();
-    void on_loadProfileButton_clicked();
-    void on_quizSelectButton_clicked();
-    void on_randomAllButton_clicked();
-    void on_lightningQuizButton_clicked();
-    void on_statisticsButton_clicked();
-    void on_optionsButton_clicked();
+    void newCardButtonClicked();
+    void newQuizButtonClicked();
+    void loadProfileButtonClicked();
+    void quizSelectButtonClicked();
+    void randomAllButtonClicked();
+    void lightningQuizButtonClicked();
+    void statisticsButtonClicked();
+    void optionsButtonClicked();
 
-    void on_backButton_clicked();
+    void backButtonClicked();
     void resetFlashCardPalette();
 
-    void on_acceptNewCardButton_clicked();
-    void on_tone0Button_clicked();
-    void on_tone1Button_clicked();
-    void on_tone2Button_clicked();
-    void on_tone3Button_clicked();
-    void on_tone4Button_clicked();
-    void on_hideNotificationLabel();
+    void acceptNewCardButtonClicked();
+    void tone0ButtonClicked();
+    void tone1ButtonClicked();
+    void tone2ButtonClicked();
+    void tone3ButtonClicked();
+    void tone4ButtonClicked();
+    void hideNotificationLabel();
 
     void cardUpdater(Card newCard);
     void createEditQuizButton_clicked();
@@ -207,6 +210,12 @@ private slots:
     void quizLoader(QString quizName);
     void deleteQuizButton_clicked();
     void deleteSelectedCardsButton_clicked();
+
+    void resolutionChangedx1366x740();
+    void resolutionChangedx1920x1040();
+
 };
+
+
 
 #endif // MAINWINDOW_H

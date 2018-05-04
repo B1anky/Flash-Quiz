@@ -1,11 +1,11 @@
 #include "MyInputDialog.h"
 
-MyInputDialog::MyInputDialog(QWidget *parent, int height, int width) : QDialog(parent){
+MyInputDialog::MyInputDialog(QWidget *parent, int height, int width, float ratio) : QDialog(parent){
     this->setAttribute(Qt::WA_QuitOnClose, false);
     vbox = new QVBoxLayout;
     textValue = new QLineEdit();
     this->resize(height, width);
-    this->setFont(QFont("Arial", 20, 1, false));
+    this->setFont(QFont("Arial", 20 * ratio, 1, false));
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     vbox->addWidget(buttonBox);
@@ -57,7 +57,6 @@ QString MyInputDialog::updateText(QString profileName,  bool* okayPressed){
 
 void MyInputDialog::keyPressEvent(QKeyEvent *e){
     if (e->key() == Qt::Key_Enter){
-        qDebug() << "Enter pressed";
         this->exec();
     }else{
         QDialog::keyPressEvent(e);

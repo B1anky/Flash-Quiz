@@ -13,7 +13,7 @@
 class MyInputDialog : QDialog{
     Q_OBJECT
 public:
-    explicit MyInputDialog(QWidget* parent = nullptr, int height = 0, int width = 0);
+    explicit MyInputDialog(QWidget* parent = nullptr, int height = 0, int width = 0, float ratio = 1.0);
     QString getText(QString profileName,  bool* okayPressed);
     QString updateText(QString profileName,  bool* okayPressed);
     void keyPressEvent(QKeyEvent *e) override;

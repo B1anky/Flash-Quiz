@@ -2,13 +2,23 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
-    QRect rec = QApplication::desktop()->screenGeometry();
-    this->resize(rec.height(), rec.height());
     setWindowFlags(this->windowFlags() |= Qt::FramelessWindowHint);
     ui->setupUi(this);
 
     delete findChild<QToolBar *>(); // NULL return value is ok for delete
     delete findChild<QMenuBar *>(); // NULL return value is ok for delete
+
+    /*
+    this->resize(1920, 1040);
+    heightRatio = 1;
+    widthRatio = 1;
+*/
+
+    this->resize(1366, 740);
+    heightRatio = .7114583333;
+    widthRatio = .71111111;
+
+    this->setFixedSize(1366, 740);
 
     languageEnglish = true;
 
@@ -16,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     masterLayout = new QStackedLayout();
 
     //Every single page's initializer primes their widgets
+    initializeDragBar();
     initializeFonts();
     initializeExitAndMinimize();
     initializeFlashCard();
@@ -25,36 +36,49 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     initializeNewCard();
     initializeNewQuiz();
     initializeOptions();
+    resetFlashCardPalette();
+    qDebug() << "desktop: " << QDesktopWidget().availableGeometry();
 
     this->centralWidget()->setLayout(masterLayout);
     masterLayout->setCurrentWidget(mainMenuWidget);
-    this->setWindowState(Qt::WindowMaximized);
+    //this->setWindowState(Qt::WindowMaximized);
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
     delete ui;
+}
+
+void MainWindow::initializeDragBar(){
+    dragBarLabel = new DragBarLabel();
+    dragBarLabel->setStyleSheet("background-color: rgba(0, 0, 0, 15);");
+    dragBarLabel->setGeometry(QRect(0,0, this->width(), this->height() * .032));
+    dragBarLabel->setParent(this);
 }
 
 void MainWindow::initializeExitAndMinimize(){
     //Need to add a simple Exit and minimize button
     exit = new HoverButton();
-    exit->setMinimumSize(QSize(25,25));
-    exit->setMaximumSize(QSize(25,25));
-    exit->move((int)(this->width() * .985), (int)(this->height() * .005));
+    exit->setMinimumSize(QSize(25 * heightRatio, 25 * widthRatio));
+    exit->setMaximumSize(QSize(25 * heightRatio, 25 * widthRatio));
+    exit->move((int)(this->width() * .985), (int)(this->height() * (.005 * heightRatio)));
+    qDebug()<< "exit is as x: " << exit->x() << ", y: " << exit->y();
     exit->setText("X");
     exit->setFont(*exitAndMinimizeFont);
-    exit->setStyleSheet("font-weight: bold;");
+    exit->setStyleSheet("background-color: rgba(255, 255, 255, 25); font-weight: bold;");
+    exit->raise();
     exit->setParent(this);
 
+
     minimize = new HoverButton();
-    minimize->setMinimumSize(QSize(25,25));
-    minimize->setMaximumSize(QSize(25,25));
+    minimize->setMinimumSize(QSize(25 * heightRatio, 25 * widthRatio));
+    minimize->setMaximumSize(QSize(25 * heightRatio, 25 * widthRatio));
     minimize->move((int)(this->width() * .97), (int)(this->height() * .005));
     minimize->setText("-");
     minimize->setFont(*exitAndMinimizeFont);
-    minimize->setStyleSheet("font-weight: bold;");
+    minimize->setStyleSheet("background-color: rgba(255, 255, 255, 25); font-weight: bold;");
+    minimize->raise();
     minimize->setParent(this);
+
 
     connect(exit, SIGNAL (released()), this, SLOT (exitClicked()));
     connect(minimize, SIGNAL (released()), this, SLOT (minimizeClicked()));
@@ -65,35 +89,33 @@ void MainWindow::exitClicked(){
 }
 
 void MainWindow::minimizeClicked(){
-    qDebug() << "should be minimizing";
-    this->setWindowState(Qt::WindowMinimized);
+    this->showMinimized();
 }
 
 void MainWindow::initializeFlashCard(){
     //Flashcard set up
-    QRect rec = QApplication::desktop()->screenGeometry();
-    int windowH = rec.height();
-    int windowW = rec.height();
     backGround = new QLabel();
-    backGround->setGeometry(QRect(203, 10, windowW, windowH));
-    backGround->setMaximumHeight(1920);
-    backGround->setMaximumHeight(1080);
+    backGround->setGeometry(QRect(0, 0, this->width(), this->height()));
+    backGround->setMaximumHeight(this->width());
+    backGround->setMaximumHeight(this->height());
+    backGround->setMinimumHeight(this->width());
+    backGround->setMinimumHeight(this->height());
 
-    pix1 = new QPixmap(":/new/pictures/flash-card.png");
-    *pix1 = pix1->scaled(rec.height(), rec.width(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     QPalette palette;
-    palette.setBrush(QPalette::Background, *pix1);
+    pix1 = new QPixmap(":/new/pictures/flash-card.png");
+    auto newPix = pix1->scaled(this->height(), this->width(), Qt::IgnoreAspectRatio , Qt::SmoothTransformation);
+    palette.setBrush(QPalette::Background, newPix);
     this->setPalette(palette);
 }
 
 void MainWindow::initializeFonts(){
     //Font info
-    cardFont->setPointSize(100);
-    textEditFont->setPointSize(25);
-    titleFont->setPointSize(50);
-    buttonFont->setPointSize(25);
-    pinyinButtonFont->setPointSize(12);
-    exitAndMinimizeFont->setPointSize(20);
+    cardFont->setPointSize(100 * heightRatio);
+    textEditFont->setPointSize(25 * heightRatio);
+    titleFont->setPointSize(50 * heightRatio);
+    buttonFont->setPointSize(25 * heightRatio);
+    pinyinButtonFont->setPointSize(12 * heightRatio);
+    exitAndMinimizeFont->setPointSize(20 * heightRatio);
     exitAndMinimizeFont->setFamily("Arial Black");
 }
 
@@ -105,14 +127,15 @@ void MainWindow::initializeNotificationLabel(){
     notificationLabel->setMinimumWidth(this->width());
     notificationLabel->setMaximumHeight(buttonHeight + 25);
     notificationLabel->setStyleSheet("background-color: rgba(255, 255, 255, 100);");
+    notificationLabel->setAttribute(Qt::WA_TranslucentBackground);
     notificationLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-    notificationLabel->move(this->width()/2 - notificationLabel->width()/2 + 25, this->height()/2  - notificationLabel->height()/2 - 320);
+    notificationLabel->move(this->width()/2 - notificationLabel->width()/2 + (25 * widthRatio), this->height()/2  - notificationLabel->height()/2 - (300 * heightRatio));
     notificationLabel->setParent(this);
     notificationLabel->setAlignment(Qt::AlignCenter);
     notificationLabel->hide();
 }
 
-void MainWindow::on_newCardButton_clicked(){
+void MainWindow::newCardButtonClicked(){
     //Show the new card menu
     showNewCard();
 }
@@ -132,7 +155,7 @@ void MainWindow::applyTone(int toneNum){
     int oldLen;
     bool moveRight = true;
     int right = 0;
-    int ind;
+    int ind = 0;
 
     //nothing highlighted
     if(str.size() == 0){
@@ -312,27 +335,27 @@ void MainWindow::applyTone(int toneNum){
     }
 }
 
-void MainWindow::on_tone0Button_clicked(){
+void MainWindow::tone0ButtonClicked(){
    applyTone(0);
 }
 
-void MainWindow::on_tone1Button_clicked(){
+void MainWindow::tone1ButtonClicked(){
    applyTone(1);
 }
 
-void MainWindow::on_tone2Button_clicked(){
+void MainWindow::tone2ButtonClicked(){
    applyTone(2);
 }
 
-void MainWindow::on_tone3Button_clicked(){
+void MainWindow::tone3ButtonClicked(){
    applyTone(3);
 }
 
-void MainWindow::on_tone4Button_clicked(){
+void MainWindow::tone4ButtonClicked(){
    applyTone(4);
 }
 
-void MainWindow::on_acceptNewCardButton_clicked(){
+void MainWindow::acceptNewCardButtonClicked(){
     //Check to make sure no fields contain their default values
     //if they do, bring up a dialogue
     bool notDefaultEng = englishText->toPlainText() == englishText->getDefaultText();
@@ -365,24 +388,24 @@ void MainWindow::on_acceptNewCardButton_clicked(){
     }
 }
 
-void MainWindow::on_hideNotificationLabel(){
+void MainWindow::hideNotificationLabel(){
     notificationLabel->hide();
 }
 
 
-void MainWindow::on_quizSelectButton_clicked(){
+void MainWindow::quizSelectButtonClicked(){
 
 }
 
-void MainWindow::on_randomAllButton_clicked(){
+void MainWindow::randomAllButtonClicked(){
 
 }
 
-void MainWindow::on_lightningQuizButton_clicked(){
+void MainWindow::lightningQuizButtonClicked(){
 
 }
 
-void MainWindow::on_statisticsButton_clicked(){
+void MainWindow::statisticsButtonClicked(){
 
 }
 
@@ -394,7 +417,7 @@ void MainWindow::resetFlashCardPalette(){
     this->setPalette(palette);
 }
 
-void MainWindow::on_backButton_clicked(){
+void MainWindow::backButtonClicked(){
     showMenu();
     resetFlashCardPalette();
     backButton->hide();
@@ -409,19 +432,19 @@ void MainWindow::initializeNewQuiz(){
     verticalLayoutWidget = new QWidget();
     verticalLayout = new QVBoxLayout(verticalLayoutWidget);
 
-    QLabel* spacer = new QLabel();
-    spacer->setMinimumWidth(this->width()/2);
-    verticalLayout->addWidget(spacer);
+    //QLabel* spacer = new QLabel();
+    //spacer->setMinimumWidth(this->width()/2);
+    //verticalLayout->addWidget(spacer);
 
     int offset = 2;
     //Text field for quiz names and selection
     quizTextEdit = new DropDownTextEdit(quizList);
-    quizTextEdit->setMinimumSize(QSize(this->width()/2, buttonHeight));
-    quizTextEdit->setMaximumSize(QSize(this->width()/2, buttonHeight));
+    quizTextEdit->setMinimumSize(QSize(this->width()/2.2, buttonHeight));
+    quizTextEdit->setMaximumSize(QSize(this->width()/2.2, buttonHeight));
     quizTextEdit->setDefaultText("Insert quiz name here");
     quizTextEdit->setText(quizTextEdit->getDefaultText());
     quizTextEdit->setFont(*textEditFont);
-    quizTextEdit->move((this->width() * .25) - quizTextEdit->width()/2, (this->height() * .085) * offset + buttonHeight * 2);
+    quizTextEdit->move((this->width() * .255) - quizTextEdit->width()/2, (this->height() * .085) * offset + buttonHeight * 2);
     quizTextEdit->setParent(verticalLayoutWidget);
 
     //Quiz Creation buttons
@@ -449,13 +472,13 @@ void MainWindow::initializeNewQuiz(){
         offset++;
     }
 
-    gridLayoutWidget = new QWidget(this);
+    gridLayoutWidget = new QWidget();
     gridLayout = new QGridLayout(gridLayoutWidget);
-
     inner = new QGridLayout();
 
     //Create a widget and set its layout as your new layout created above
     viewport = new QWidget();
+    viewport->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
     viewport->setLayout(inner);
 
     //Add the viewport to the scroll area
@@ -464,8 +487,10 @@ void MainWindow::initializeNewQuiz(){
     gridLayout->addWidget(scrollArea);
 
     //Add the lest hand and right hand side to the main layout
-    quizCreateLayout->addWidget(verticalLayoutWidget);
-    quizCreateLayout->addWidget(gridLayoutWidget);
+    gridLayoutWidget->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
+    verticalLayoutWidget->setGeometry(QRect(0,this->height() * .05,this->width()/2,(950 * widthRatio)));
+    verticalLayoutWidget->setParent(quizCreateWidget);
+    gridLayoutWidget->setParent(quizCreateWidget);
 
     //Add the quiz creation menu to the master layout
     masterLayout->addWidget(quizCreateWidget);
@@ -505,11 +530,11 @@ void MainWindow::cardDisplayer(){
     }
 }
 
-void MainWindow::on_newQuizButton_clicked(){
+void MainWindow::newQuizButtonClicked(){
     showMakeQuizMenu();
 }
 
-void MainWindow::on_optionsButton_clicked(){
+void MainWindow::optionsButtonClicked(){
     backButton->show();
     masterLayout->setCurrentWidget(optionsWidget);
 }
@@ -518,36 +543,131 @@ void MainWindow::initializeOptions(){
     optionsWidget = new QWidget();
 
     //Need to add a scale factor for different resolutions
-    //Current base scale is 1920 x 1080 (16:19)
-    resolutions = {QPair<int,int>(1366, 768), QPair<int,int>(1920, 1080)};
+    //Current base scale is 1920 x 1040 (16:19)
 
-    x1920x1080 = new HoverButton();
-    x1366x768 = new HoverButton();
+    x1920x1040 = new HoverButton();
+    x1366x740 = new HoverButton();
 
-    resolutionButtonList = {x1366x768, x1920x1080};
+    QVector<int> resolutionCompareList = {1366 * 740, 1920 * 1040};
+    resolutionButtonList = {x1366x740, x1920x1040};
+
+    //Eliminate resolutions greater than current desktop's available geometry
+    QRect usersDesktopRect = QDesktopWidget().availableGeometry();
+    int usersWidth = usersDesktopRect.width();
+    int usersHeight = usersDesktopRect.height();
+
+    for(int i = resolutionCompareList.size() - 1; i >= 0; i--){
+        if(usersWidth * usersHeight < resolutionCompareList[i]){
+            resolutionCompareList.remove(i);
+            resolutionButtonList.remove(i);
+        }
+    }
+
     int offset = 2;
     for(auto button: resolutionButtonList){
         button->setMinimumSize(buttonWidth, buttonHeight);
         button->setMaximumSize(buttonWidth, buttonHeight);
         button->setFont(*buttonFont);
-        button->move((this->width() * .5) - button->width()/2, (this->height() * .085) * offset + buttonHeight * 2);
+        button->move((this->width() * .5) - button->width()/2, (this->height() * .088) * offset + buttonHeight * 2);
         button->setParent(optionsWidget);
         offset++;
     }
 
-    x1366x768->setText("1366 x 768");
-    x1920x1080->setText("1920 x 1080");
-
-
-
-
-    //If current user is at 1920x1080 and wants to go to 1366x768
-    //Do math
-    //Multiple constants by desired/current
-    //xRatio = this->width() - desiredWidth;
-
+    x1366x740->setText("1366 x 766");
+    x1920x1040->setText("1920 x 1080");
 
     masterLayout->addWidget(optionsWidget);
+
+    connect(x1366x740, SIGNAL (released()), this, SLOT (resolutionChangedx1366x740()));
+    connect(x1920x1040, SIGNAL (released()), this, SLOT (resolutionChangedx1920x1040()));
+
+
+}
+
+void MainWindow::resolutionChangedx1366x740(){
+    //Mark their current resolution as used
+    int currentHeight = this->height();
+    int currentWidth = this->width();
+
+    if(currentWidth != 1366 && currentHeight != 740){
+        //Find the ratio of height and width for resizing all widgets
+        heightRatio = .7114583333;
+        widthRatio = .7115384615;
+        //Reinitialize all windows to fix scale of widgets and then resize this
+        this->setFixedSize(1366, 740);
+        this->setGeometry(this->x() + 100, this->y() + 100, 1366, 740);
+        reinitializeAll();
+        //Prompt user to check if they like the change
+    }
+
+}
+
+void MainWindow::resolutionChangedx1920x1040(){
+    //Mark their current resolution as used
+    int currentHeight = this->height();
+    int currentWidth = this->width();
+
+    if(currentWidth != 1920 && currentHeight != 1040){
+        //Find the ratio of height and width for resizing all widgets
+        heightRatio = 1;
+        widthRatio = 1;
+        //Reinitialize all windows to fix scale of widgets and then resize this
+        this->setFixedSize(1920, 1040);
+        this->setGeometry(0, 0, 1920, 1040);
+        reinitializeAll();
+        //Prompt user to check if they like the change
+    }
+
+}
+
+/*
+void MainWindow::mousePressEvent(QMouseEvent *event) {
+    m_nMouseClick_X_Coordinate = event->x();
+    m_nMouseClick_Y_Coordinate = event->y();
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event) {
+    move(event->globalX()-m_nMouseClick_X_Coordinate,event->globalY()-m_nMouseClick_Y_Coordinate);
+}
+*/
+
+void MainWindow::reinitializeAll(){
+    for(int i = 0; i < masterLayout->count(); i++){
+        QWidget *widget = masterLayout->itemAt(i)->widget();
+        if(widget){
+            widget->deleteLater();
+        }
+    }
+
+
+    backButton->deleteLater();
+    titleLabel->deleteLater();
+    notificationLabel->deleteLater();
+    exit->deleteLater();
+    minimize->deleteLater();
+    dragBarLabel->deleteLater();
+
+    buttonHeight = 50 * heightRatio;
+    buttonWidth = 350 * widthRatio;
+
+    initializeFonts();
+    initializeFlashCard();
+    resetFlashCardPalette();
+    initializeMenuButtons();
+    initializeBackButton();
+    initializeNotificationLabel();
+    initializeNewCard();
+    initializeNewQuiz();
+    initializeOptions();
+    initializeDragBar();
+    initializeExitAndMinimize();
+    masterLayout->setCurrentWidget(optionsWidget);
+
+    backButton->show();
+    dragBarLabel->show();
+    exit->show();
+    minimize->show();
+
 }
 
 void MainWindow::initializeNewCard(){
@@ -585,7 +705,7 @@ void MainWindow::initializeNewCard(){
         text->setMinimumWidth(2 * buttonWidth);
         text->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         text->setFont(*buttonFont);
-        text->setGeometry((int)((this->width() * .5) - text->width()/2), (int)(this->height() * .17) * offset + buttonHeight * 2, buttonWidth*2, buttonHeight);
+        text->setGeometry((int)((this->width() * .5) - text->width()/2), (int)(this->height() * .175) * offset + buttonHeight/4 + (95 * heightRatio), buttonWidth*2, buttonHeight);
         text->setParent(newCardWidget);
         offset++;
     }
@@ -610,22 +730,24 @@ void MainWindow::initializeNewCard(){
     for(auto button: pinButtonList){
         button->setMinimumWidth(buttonWidth/9);
         button->setMinimumHeight(buttonHeight);
+        button->setMaximumWidth(buttonWidth/9);
+        button->setMaximumHeight(buttonHeight);
         button->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         button->setFont(*pinyinButtonFont);
-        button->move((int)((this->width() * .85) - button->width()/2) + offset * buttonWidth/9, (int)(this->height() * .17) * 2 + buttonHeight * 2);
+        button->move((int)((this->width() * .7) - button->width()/9) + offset * buttonWidth/9, (int)(this->height() * .175) * 2 + (buttonHeight/4 + (95 * heightRatio)));
         button->setParent(newCardWidget);
         offset+=2;
     }
 
     masterLayout->addWidget(newCardWidget);
 
-    connect(acceptNewCardButton, SIGNAL (released()), this, SLOT (on_acceptNewCardButton_clicked()));
+    connect(acceptNewCardButton, SIGNAL (released()), this, SLOT (acceptNewCardButtonClicked()));
 
-    connect(tone0Button, SIGNAL (released()), this, SLOT (on_tone0Button_clicked()));
-    connect(tone1Button, SIGNAL (released()), this, SLOT (on_tone1Button_clicked()));
-    connect(tone2Button, SIGNAL (released()), this, SLOT (on_tone2Button_clicked()));
-    connect(tone3Button, SIGNAL (released()), this, SLOT (on_tone3Button_clicked()));
-    connect(tone4Button, SIGNAL (released()), this, SLOT (on_tone4Button_clicked()));
+    connect(tone0Button, SIGNAL (released()), this, SLOT (tone0ButtonClicked()));
+    connect(tone1Button, SIGNAL (released()), this, SLOT (tone1ButtonClicked()));
+    connect(tone2Button, SIGNAL (released()), this, SLOT (tone2ButtonClicked()));
+    connect(tone3Button, SIGNAL (released()), this, SLOT (tone3ButtonClicked()));
+    connect(tone4Button, SIGNAL (released()), this, SLOT (tone4ButtonClicked()));
 
 }
 
@@ -639,13 +761,10 @@ void MainWindow::initializeBackButton(){
     backButton->setParent(this);
     backButton->setText("Back");
     backButton->hide();
-    connect(backButton, SIGNAL (released()), this, SLOT (on_backButton_clicked()));
+    connect(backButton, SIGNAL (released()), this, SLOT (backButtonClicked()));
 }
 
 void MainWindow::initializeMenuButtons(){
-    QSizePolicy labelPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::Label);
-    QSizePolicy buttonPolicy(QSizePolicy::Preferred,QSizePolicy::Preferred, QSizePolicy::PushButton);
-
     mainMenuWidget = new QWidget();
     mainMenuLayout = new QVBoxLayout(mainMenuWidget);
 
@@ -673,46 +792,40 @@ void MainWindow::initializeMenuButtons(){
         optionsButton->setText("Options");
     }
 
-    auto titleSpacer = new QSpacerItem(20, 50, QSizePolicy::Fixed);
-    mainMenuLayout->addItem(titleSpacer);
-
     titleLabel->setMaximumWidth(buttonWidth * 2);
     titleLabel->setMaximumHeight(buttonHeight * 2);
+    titleLabel->setMinimumWidth(buttonWidth * 2);
+    titleLabel->setMinimumHeight(buttonHeight * 2);
     titleLabel->setFont(*titleFont);
-    titleLabel->move((this->width() * .5) - titleLabel->width()/4, this->height() * .1 - titleLabel->height());
+    titleLabel->move((int)(this->width() * .5  - titleLabel->width()/4.5), (int)(this->height() * .1  - titleLabel->height()/2));
     titleLabel->setParent(mainMenuWidget);
-
-    auto vSpacer1 = new QSpacerItem(20, 140, QSizePolicy::Fixed);
-    mainMenuLayout->addItem(vSpacer1);
 
     int offset = 2;
     for(auto button: buttonList){
         button->setMaximumWidth(buttonWidth);
         button->setMaximumHeight(buttonHeight);
-        //button->setSizePolicy(buttonPolicy);
         button->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
         button->setFont(*buttonFont);
-        button->move((this->width() * .5) - button->width()/2, (this->height() * .085) * offset + buttonHeight * 2);
+        button->move((this->width() * .5) - button->width()/2, (this->height() * .088) * offset + buttonHeight * 2);
         button->setParent(mainMenuWidget);
         offset++;
     }
 
     //add main menu layout to masterLayout
     masterLayout->addWidget(mainMenuWidget);
-    mainMenuLayout->setAlignment(Qt::AlignCenter);
 
-    connect(newCardButton, SIGNAL (released()), this, SLOT (on_newCardButton_clicked()));
-    connect(newQuizButton, SIGNAL (released()), this, SLOT (on_newQuizButton_clicked()));
-    connect(loadProfileButton, SIGNAL (released()), this, SLOT (on_loadProfileButton_clicked()));
-    connect(quizSelectButton, SIGNAL (released()), this, SLOT (on_quizSelectButton_clicked()));
-    connect(randomAllButton, SIGNAL (released()), this, SLOT (on_randomAllButton_clicked()));
-    connect(lightningQuizButton, SIGNAL (released()), this, SLOT (on_lightningQuizButton_clicked()));
-    connect(statisticsButton, SIGNAL (released()), this, SLOT (on_statisticsButton_clicked()));
-    connect(optionsButton, SIGNAL (released()), this, SLOT(on_optionsButton_clicked()));
+    connect(newCardButton, SIGNAL (released()), this, SLOT (newCardButtonClicked()));
+    connect(newQuizButton, SIGNAL (released()), this, SLOT (newQuizButtonClicked()));
+    connect(loadProfileButton, SIGNAL (released()), this, SLOT (loadProfileButtonClicked()));
+    connect(quizSelectButton, SIGNAL (released()), this, SLOT (quizSelectButtonClicked()));
+    connect(randomAllButton, SIGNAL (released()), this, SLOT (randomAllButtonClicked()));
+    connect(lightningQuizButton, SIGNAL (released()), this, SLOT (lightningQuizButtonClicked()));
+    connect(statisticsButton, SIGNAL (released()), this, SLOT (statisticsButtonClicked()));
+    connect(optionsButton, SIGNAL (released()), this, SLOT(optionsButtonClicked()));
 }
 
-void MainWindow::on_loadProfileButton_clicked(){
-    bool loaded = loadProfile();
+void MainWindow::loadProfileButtonClicked(){
+    loadProfile(); //bool loaded =
     /*
     if(loaded){
         for(auto quiz : quizList){
@@ -813,6 +926,7 @@ void MainWindow::showMakeQuizMenu(){
     backButton->show();
     this->setPalette(QPalette());
     masterLayout->setCurrentWidget(quizCreateWidget);
+    quizTextEdit->clearFocus();
 }
 
 void MainWindow::showNewCard(){
@@ -848,7 +962,7 @@ void MainWindow::fireAnimation(){
     fadeOut->setEndValue(0);
     fadeOut->setEasingCurve(QEasingCurve::OutBack);
     fadeOut->start(QPropertyAnimation::DeleteWhenStopped);
-    connect(fadeOut,SIGNAL(finished()),this,SLOT(on_hideNotificationLabel()));
+    connect(fadeOut,SIGNAL(finished()),this,SLOT(hideNotificationLabel()));
 }
 
 //create a new quiz based on quizTextEdit's content
@@ -885,7 +999,8 @@ void MainWindow::saveQuizButton_clicked(){
     //First prompt the user for their profile name if it isn't currently set
     bool getNameOkay = false;
 
-    MyInputDialog* getUserName = new MyInputDialog(nullptr, 750, 200);
+    MyInputDialog* getUserName = new MyInputDialog(nullptr, 750 * widthRatio, 200 * heightRatio, heightRatio);
+
     if(profileName == "Guest"){
         profileName = getUserName->getText(profileName, &getNameOkay);
     }else{
@@ -1074,20 +1189,3 @@ void MainWindow::deleteSelectedCardsButton_clicked(){
     notificationLabel->setText("Selected Card have been deleted!");
     fireAnimation();
 }
-
-void MainWindow::resizeEvent(QResizeEvent* event){
-    float ratio = (float)this->height()/(float)this->width();
-
-    prevHeight = this->height();
-    prevWidth = this->width();
-    if(ratio == 9/16.0){
-        auto size = this->size();
-        auto pixNew = pix1->scaled(size.width(), size.height(), Qt::KeepAspectRatio, Qt::FastTransformation);
-        QPalette palette;
-        palette.setBrush(QPalette::Background, pixNew);
-        this->setPalette(palette);
-    }
-
-    QWidget::resizeEvent(event);
-}
-
