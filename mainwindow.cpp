@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     initializeNewCard();
     initializeNewQuiz();
     initializeOptions();
+    initializeQuizSelect();
     resetFlashCardPalette();
     qDebug() << "desktop: " << QDesktopWidget().availableGeometry();
 
@@ -139,6 +140,39 @@ void MainWindow::newCardButtonClicked(){
     //Show the new card menu
     showNewCard();
 }
+
+void MainWindow::initializeQuizSelect(){
+    quizSelectWidget = new QWidget();
+    quizSelectLayout = new QGridLayout(quizSelectWidget);
+    quizSelectLayout->setAlignment(Qt::AlignCenter);
+
+    verticalQuizSelectLayoutWidget = new QWidget();
+    verticalQuizSelectLayoutWidget->setObjectName(QStringLiteral("QuizSelectLayoutWidget"));
+    verticalQuizSelectLayoutWidget->setGeometry(QRect(10,0,951,1021));
+    verticalQuizSelectLayout = new QVBoxLayout(quizLayoutWidget);
+    verticalQuizSelectLayout->setObjectName(QStringLiteral("quizSelectLayout"));
+    verticalQuizSelectLayout->setContentsMargins(0,0,0,0);
+    verticalQuizSelectSpacer_9 = new QSpacerItem(20,40,QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalQuizSelectSpacer_5 = new QSpacerItem(20,40,QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalQuizSelectLayout->addItem(verticalQuizSelectSpacer_9);
+    verticalQuizSelectLayout->addItem(verticalQuizSelectSpacer_5);
+
+    quizSelectScrollViewer = new QGridLayout();
+    quizViewport = new QWidget;
+    quizViewport->setLayout(inner);
+
+        //Add the viewport to the scroll area
+    qscrollArea = new QScrollArea;
+    qscrollArea->setWidget(quizViewport);
+
+    gridLayout->addWidget(qscrollArea);
+
+    quizSelectLayout->addWidget(verticalQuizSelectLayoutWidget);
+    quizSelectLayout->addWidget(gridLayoutWidget);
+
+    masterLayout->addWidget(quizSelectWidget);
+}
+
 
 void MainWindow::applyTone(int toneNum){
     QString vowels = "aeiou";
@@ -394,7 +428,12 @@ void MainWindow::hideNotificationLabel(){
 
 
 void MainWindow::quizSelectButtonClicked(){
+    showQuizSelect();
+}
 
+void MainWindow::showQuizSelect(){
+    quizSelectLayout->addWidget(backButton, 0, 0);
+    masterLayout->setCurrentWidget(quizSelectWidget);
 }
 
 void MainWindow::randomAllButtonClicked(){
