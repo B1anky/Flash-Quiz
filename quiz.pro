@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     DropDownTextEdit.cpp \
     HoverButton.cpp \
     MyInputDialog.cpp \
-    DragBarLabel.cpp
+    DragBarLabel.cpp \
+    QuizButton.cpp
 
 HEADERS  += mainwindow.h \
     Card.h \
@@ -28,7 +29,8 @@ HEADERS  += mainwindow.h \
     DropDownTextEdit.h \
     HoverButton.h \
     MyInputDialog.h \
-    DragBarLabel.h
+    DragBarLabel.h \
+    QuizButton.h
 
 FORMS    += mainwindow.ui \
     QuizEditor.ui \

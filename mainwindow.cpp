@@ -8,18 +8,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     delete findChild<QToolBar *>(); // NULL return value is ok for delete
     delete findChild<QMenuBar *>(); // NULL return value is ok for delete
 
-    /*
+
     this->resize(1920, 1040);
     heightRatio = 1;
     widthRatio = 1;
-*/
+    this->setFixedSize(1920, 1040);
 
+/*
     this->resize(1366, 740);
     heightRatio = .71145833;
     widthRatio = .71111111;
-
     this->setFixedSize(1366, 740);
-
+*/
     languageEnglish = true;
 
     //All layouts for every page will be stored here for easy separation of show and hide
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     initializeDragBar();
     initializeFonts();
     initializeExitAndMinimize();
-    initializeFlashCard();
+    initializeImageFiles();
     initializeMenuButtons();
     initializeBackButton();
     initializeNotificationLabel();
@@ -93,7 +93,7 @@ void MainWindow::minimizeClicked(){
     this->showMinimized();
 }
 
-void MainWindow::initializeFlashCard(){
+void MainWindow::initializeImageFiles(){
     //Flashcard set up
     backGround = new QLabel();
     backGround->setGeometry(QRect(0, 0, this->width(), this->height()));
@@ -103,10 +103,13 @@ void MainWindow::initializeFlashCard(){
     backGround->setMinimumHeight(this->height());
 
     QPalette palette;
-    pix1 = new QPixmap(":/new/pictures/flash-card.png");
-    auto newPix = pix1->scaled(this->height(), this->width(), Qt::IgnoreAspectRatio , Qt::SmoothTransformation);
-    palette.setBrush(QPalette::Background, newPix);
+    flashCardImage = new QPixmap(":/pictures/flash-card.png");
+    auto scaledFlashCard = flashCardImage->scaled(this->height(), this->width(), Qt::IgnoreAspectRatio , Qt::SmoothTransformation);
+    palette.setBrush(QPalette::Background, scaledFlashCard);
     this->setPalette(palette);
+
+    mountainImage = new QPixmap(":/pictures/mountains.png");
+    auto scaledMountain = mountainImage->scaled(this->height(), this->width(), Qt::IgnoreAspectRatio , Qt::SmoothTransformation);
 }
 
 void MainWindow::initializeFonts(){
@@ -142,39 +145,71 @@ void MainWindow::newCardButtonClicked(){
 }
 
 void MainWindow::initializeQuizSelect(){
-    QRect quizSelectQRect(QRect(this->width() * .1, this->height() * .05, this->width() * .5, this->height() * .75));
+    QRect quizSelectQRect(QRect(this->width() * .1, this->height() * .05, this->width() * .95, this->height() * .95));
+    QRect quizSelectScrollQRect(QRect(this->width() * .125, this->height() * .2, this->width() * .75, this->height() * .65));
+    QRect quizSelectScrollQRect2(QRect(this->width() * .125, this->height() * .2, this->width() * .75, 50 * buttonHeight));
+
 
     quizSelectWidget = new QWidget();
     quizSelectWidget->setGeometry(quizSelectQRect);
 
-    quizSelectLayout = new QGridLayout(quizSelectWidget);
-    quizSelectLayout->setGeometry(quizSelectQRect);
+    quizSelectLayout = new QVBoxLayout(quizSelectWidget);
+    quizSelectLayout->setGeometry(quizSelectScrollQRect);
 
     quizSelectGridWidget = new QWidget();
-    quizGridLayout = new QGridLayout(quizSelectGridWidget);
-    quizGridLayout->setGeometry(quizSelectQRect);
-    quizInner = new QGridLayout();
-    quizInner->setGeometry(quizSelectQRect);
+    quizSelectGridWidget->setGeometry(quizSelectScrollQRect);
+    quizGridLayout = new QVBoxLayout(quizSelectGridWidget);
+
+    quizInner = new QVBoxLayout();
 
     quizViewport = new QWidget();
-    quizViewport->setGeometry(quizSelectQRect);
+    quizViewport->setGeometry(quizSelectScrollQRect2);
     quizViewport->setLayout(quizInner);
+    quizViewport->setParent(quizSelectGridWidget);
 
     qscrollArea = new QScrollArea();
     qscrollArea->setWidget(quizViewport);
-
     quizGridLayout->addWidget(qscrollArea);
+    quizSelectGridWidget->setParent(quizSelectWidget);
+    setScrollAreaStyleSheet(qscrollArea);
 
     for(int i = 0; i < 50; i++){
-        HoverButton* test = new HoverButton();
+        QuizButton* test = new QuizButton();
         test->setText(QString::number(i));
         test->setMinimumSize(buttonWidth, buttonHeight);
         test->setMaximumSize(buttonWidth, buttonHeight);
-        quizInner->addWidget(test, i, 0, Qt::AlignTop);
+        test->setParent(quizViewport);
+        test->move(quizSelectGridWidget->width()/2 - buttonWidth/2, i * buttonHeight);
     }
 
-    quizSelectLayout->addWidget(quizSelectGridWidget);
-    quizSelectGridWidget->setParent(quizSelectWidget);
+    //Add buttons for accept, and selection
+    HoverButton* startQuizButton = new HoverButton();
+    startQuizButton->setText("Begin Quiz");
+    startQuizButton->setFont(*buttonFont);
+    startQuizButton->setMaximumSize(QSize(buttonWidth, buttonHeight));
+    startQuizButton->setMinimumSize(QSize(buttonWidth, buttonHeight));
+    startQuizButton->move((this->width() * .95) - buttonWidth, this->height() * .1);
+    startQuizButton->setParent(quizSelectWidget);
+
+    QuizButton* englishSelectedButton = new QuizButton();
+    QuizButton* pinyinSelectedButton = new QuizButton();
+    QuizButton* chineseSelectedButton = new QuizButton();
+
+    QVector<QuizButton*> userQuizOptionsButtons = {englishSelectedButton, pinyinSelectedButton, chineseSelectedButton};
+    englishSelectedButton->setText("English Mode");
+    pinyinSelectedButton->setText("Pinyin Mode");
+    chineseSelectedButton->setText("Chinese Mode");
+
+    int offset = 0;
+    for(auto button: userQuizOptionsButtons){
+        button->setMaximumSize(QSize(buttonWidth, buttonHeight));
+        button->setMinimumSize(QSize(buttonWidth, buttonHeight));
+        button->setFont(*buttonFont);
+        button->move(this->width() * .05 + offset * buttonWidth, this->height() * .875);
+        button->setParent(quizSelectWidget);
+        offset+=2;
+    }
+
 
     masterLayout->addWidget(quizSelectWidget);
 }
@@ -411,16 +446,31 @@ void MainWindow::acceptNewCardButtonClicked(){
             cardMade = true;
         }
     }
-    //qDebug() << "moshi moshi!";
     if(cardMade){
         Card* newCard = new Card(englishText->toPlainText(), pinyinText->toPlainText(), chineseText->toPlainText());
         cardUpdater(*newCard);
 
-        //notificationLabel->setText("New card Added!");
+        //Create a widget and set its layout as your new layout created above
+        gridLayout->removeWidget(scrollArea);
+        scrollArea->deleteLater();
+        viewport->deleteLater();
+
+        viewport = new QWidget();
+        viewport->setLayout(inner);
+
+        //Add the viewport to the scroll area
+        scrollArea = new QScrollArea;
+        scrollArea->setWidget(viewport);
+        setScrollAreaStyleSheet(scrollArea);
+        gridLayout->addWidget(scrollArea);
+
+        //Revisualize the cards
+        cardDisplayer();
+
+        notificationLabel->setText("New card Added!");
         //Fade in label
-        //qDebug() << "I want to make a label!";
         fireAnimation();
-        //qDebug() << "I made a label!";
+
         for(auto text: newCardTextEditList){
             text->setText(text->getDefaultText());
         }
@@ -457,7 +507,7 @@ void MainWindow::statisticsButtonClicked(){
 
 void MainWindow::resetFlashCardPalette(){
     auto size = this->size();
-    auto pixNew = pix1->scaled(size.width(), size.height(), Qt::KeepAspectRatioByExpanding , Qt::FastTransformation);
+    auto pixNew = flashCardImage->scaled(size.width(), size.height(), Qt::KeepAspectRatioByExpanding , Qt::FastTransformation);
     QPalette palette;
     palette.setBrush(QPalette::Background, pixNew);
     this->setPalette(palette);
@@ -518,6 +568,8 @@ void MainWindow::initializeNewQuiz(){
     gridLayout = new QGridLayout(gridLayoutWidget);
     inner = new QGridLayout();
 
+
+
     //Create a widget and set its layout as your new layout created above
     viewport = new QWidget();
     viewport->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
@@ -526,6 +578,7 @@ void MainWindow::initializeNewQuiz(){
     //Add the viewport to the scroll area
     scrollArea = new QScrollArea;
     scrollArea->setWidget(viewport);
+    setScrollAreaStyleSheet(scrollArea);
     gridLayout->addWidget(scrollArea);
 
     //Add the lest hand and right hand side to the main layout
@@ -545,13 +598,31 @@ void MainWindow::initializeNewQuiz(){
     connect(deleteSelectedCardsButton, SIGNAL (released()), this, SLOT (deleteSelectedCardsButton_clicked()));
 }
 
+void MainWindow::updateQuizCardResolution(){
+    for(auto& quizCard : physicalCardButtonList){
+        quizCard->setMinimumHeight(275 * heightRatio);
+        quizCard->setMinimumWidth(440 * widthRatio);
+        quizCard->setMaximumHeight(275 * heightRatio);
+        quizCard->setMaximumWidth(440 * widthRatio);
+        QPixmap *cardImg = new QPixmap(*flashCardImage);
+        QPainter painter(cardImg);
+        painter.setFont(*cardFont);
+        //painter.drawText(QPoint(200, 285), quizCard->getCard().getEnglish());
+        //painter.drawText(QPoint(200, 540), quizCard->getCard().getPinyin());
+        //painter.drawText(QPoint(200, 800), quizCard->getCard().getChinese());
+        QIcon ButtonIcon(*cardImg);
+        quizCard->setIcon(ButtonIcon);
+        quizCard->setIconSize(QSize(425 * widthRatio, 275 * heightRatio));
+    }
+}
+
 void MainWindow::cardUpdater(Card newCard){
     QuizCard *quizCard = new QuizCard(newCard, selectedCards);
-    quizCard->setMinimumHeight(150);
-    quizCard->setMinimumWidth(300);
-    quizCard->setMaximumHeight(250);
-    quizCard->setMaximumWidth(425);
-    QPixmap *cardImg = new QPixmap(*pix1);
+    quizCard->setMinimumHeight(275 * heightRatio);
+    quizCard->setMinimumWidth(440 * widthRatio);
+    quizCard->setMaximumHeight(275 * heightRatio);
+    quizCard->setMaximumWidth(440 * widthRatio);
+    QPixmap *cardImg = new QPixmap(*flashCardImage);
     QPainter painter(cardImg);
     painter.setFont(*cardFont);
     painter.drawText(QPoint(200, 285), quizCard->getCard().getEnglish());
@@ -559,7 +630,7 @@ void MainWindow::cardUpdater(Card newCard){
     painter.drawText(QPoint(200, 800), quizCard->getCard().getChinese());
     QIcon ButtonIcon(*cardImg);
     quizCard->setIcon(ButtonIcon);
-    quizCard->setIconSize(QSize(380, 315));
+    quizCard->setIconSize(QSize(425 * widthRatio, 275 * heightRatio));
     userCards.push_back(quizCard->getCardRef());
     physicalCardButtonList.push_back(quizCard);
     inner->addWidget(quizCard, (userCards.size() - 1) / 2, (userCards.size() - 1) % 2, Qt::AlignTop);
@@ -662,17 +733,6 @@ void MainWindow::resolutionChangedx1920x1040(){
 
 }
 
-/*
-void MainWindow::mousePressEvent(QMouseEvent *event) {
-    m_nMouseClick_X_Coordinate = event->x();
-    m_nMouseClick_Y_Coordinate = event->y();
-}
-
-void MainWindow::mouseMoveEvent(QMouseEvent *event) {
-    move(event->globalX()-m_nMouseClick_X_Coordinate,event->globalY()-m_nMouseClick_Y_Coordinate);
-}
-*/
-
 void MainWindow::reinitializeAll(){
     for(int i = 0; i < masterLayout->count(); i++){
         QWidget *widget = masterLayout->itemAt(i)->widget();
@@ -693,13 +753,15 @@ void MainWindow::reinitializeAll(){
     buttonWidth = 350 * widthRatio;
 
     initializeFonts();
-    initializeFlashCard();
+    initializeImageFiles();
     resetFlashCardPalette();
     initializeMenuButtons();
     initializeBackButton();
     initializeNotificationLabel();
     initializeNewCard();
     initializeNewQuiz();
+    updateQuizCardResolution();
+    initializeQuizSelect();
     initializeOptions();
     initializeDragBar();
     initializeExitAndMinimize();
@@ -709,7 +771,6 @@ void MainWindow::reinitializeAll(){
     dragBarLabel->show();
     exit->show();
     minimize->show();
-
 }
 
 void MainWindow::initializeNewCard(){
@@ -839,7 +900,7 @@ void MainWindow::initializeMenuButtons(){
     titleLabel->setMinimumWidth(buttonWidth * 2);
     titleLabel->setMinimumHeight(buttonHeight * 2);
     titleLabel->setFont(*titleFont);
-    titleLabel->move((int)(this->width() * .5  - titleLabel->width()/4.5), (int)(this->height() * .1  - titleLabel->height()/2));
+    titleLabel->move((int)(this->width() * .425 ), (int)(this->height() * .1  - titleLabel->height()/2));
     titleLabel->setParent(mainMenuWidget);
 
     int offset = 2;
@@ -919,10 +980,8 @@ bool MainWindow::loadProfile(){
                     QString chinese = curCard[j+2];
                     Card* newCard = new Card(english, pinyin, chinese);
                     cardUpdater(*newCard);
-                    //qDebug() << *newCard;
                 }
             }else{
-                //qDebug() <<"Quiz" << (i - 1);
                 //Has to be a quiz
                 QStringList curQuiz = fields[i].split("\n");
                 QString* quizName = new QString(curQuiz[1]);
@@ -945,13 +1004,16 @@ bool MainWindow::loadProfile(){
     quizTextEdit->updateCompleter(quizList);
 
     gridLayout->removeWidget(scrollArea);
+    scrollArea->deleteLater();
+    viewport->deleteLater();
 
-    viewport = new QWidget;
+    viewport = new QWidget();
     viewport->setLayout(inner);
 
     //Add the viewport to the scroll area
-    scrollArea = new QScrollArea;
+    scrollArea = new QScrollArea();
     scrollArea->setWidget(viewport);
+    setScrollAreaStyleSheet(qscrollArea);
 
     gridLayout->addWidget(scrollArea);
 
@@ -964,9 +1026,52 @@ bool MainWindow::loadProfile(){
     return true;
 }
 
+void MainWindow::setScrollAreaStyleSheet(QScrollArea* scrollA){
+    scrollA->setStyleSheet(QString::fromUtf8("background: transparent; }"
+        "QScrollBar:vertical {"
+        "    border: 1px solid #999999;"
+        "    background:white;"
+        "    width:20px;    "
+        "    margin: 0px 0px 0px 0px;"
+        "}"
+        "QScrollBar:horizontal {"
+        "    border: 1px solid #999999;"
+        "    background:white;"
+        "    width:20px;    "
+        "    margin: 0px 0px 0px 0px;"
+        "}"
+        "QScrollBar::handle:vertical {"
+        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
+        "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop:1 rgb(32, 47, 130));"
+        "    min-height: 0px;"
+        "}"
+        "QScrollBar::add-line:vertical {"
+        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
+        "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
+        "    height: 0px;"
+        "    subcontrol-position: bottom;"
+        "    subcontrol-origin: margin;"
+        "}"
+        "QScrollBar::sub-line:vertical {"
+        "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
+        "    stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));"
+        "    height: 0 px;"
+        "    subcontrol-position: top;"
+        "    subcontrol-origin: margin;"
+        "}"
+        ));
+}
+
 void MainWindow::showMakeQuizMenu(){
     backButton->show();
     this->setPalette(QPalette());
+
+    QPalette palette;
+    palette.setBrush(QPalette::Background, *mountainImage);
+    this->setPalette(palette);
+
+    setScrollAreaStyleSheet(scrollArea);
+
     masterLayout->setCurrentWidget(quizCreateWidget);
     quizTextEdit->clearFocus();
 }
@@ -988,7 +1093,7 @@ void MainWindow::fireAnimation(){
     notificationLabel->setGraphicsEffect(fadeInEff);
     notificationLabel->show();
     QPropertyAnimation *fadeIn = new QPropertyAnimation(fadeInEff,"opacity");
-    fadeIn->setDuration(5000);
+    fadeIn->setDuration(7000);
     fadeIn->setStartValue(0);
     fadeIn->setEndValue(1);
     fadeIn->setEasingCurve(QEasingCurve::InBack);
@@ -999,7 +1104,7 @@ void MainWindow::fireAnimation(){
     notificationLabel->setGraphicsEffect(fadeOutEff);
     QPropertyAnimation *fadeOut = new QPropertyAnimation(fadeOutEff,"opacity");
     //notificationLabel->lower();
-    fadeOut->setDuration(5000);
+    fadeOut->setDuration(7000);
     fadeOut->setStartValue(1);
     fadeOut->setEndValue(0);
     fadeOut->setEasingCurve(QEasingCurve::OutBack);
@@ -1213,20 +1318,20 @@ void MainWindow::deleteSelectedCardsButton_clicked(){
 
     //Create a widget and set its layout as your new layout created above
     gridLayout->removeWidget(scrollArea);
+    scrollArea->deleteLater();
+    viewport->deleteLater();
 
-    viewport = new QWidget;
+    viewport = new QWidget();
     viewport->setLayout(inner);
 
     //Add the viewport to the scroll area
     scrollArea = new QScrollArea;
     scrollArea->setWidget(viewport);
-
+    setScrollAreaStyleSheet(scrollArea);
     gridLayout->addWidget(scrollArea);
 
     //Revisualize the cards
     cardDisplayer();
-    //masterLayout->setCurrentWidget(mainMenuWidget);
-    //masterLayout->setCurrentWidget(quizWidget);
 
     notificationLabel->setText("Selected Card have been deleted!");
     fireAnimation();

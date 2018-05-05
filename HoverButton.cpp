@@ -5,6 +5,7 @@ HoverButton::HoverButton(QPushButton *parent): QPushButton(parent){
     this->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
 }
 
+/*
 void HoverButton::enterEvent(QHoverEvent *e){
 
 
@@ -13,6 +14,7 @@ void HoverButton::enterEvent(QHoverEvent *e){
 void HoverButton::leaveEvent(QHoverEvent *e){
 
 }
+*/
 
 void HoverButton::hoverEnter(QHoverEvent *event){
      this->setStyleSheet("background-color: rgba(0, 0, 0); color: white");

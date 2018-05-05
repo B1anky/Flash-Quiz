@@ -5,6 +5,7 @@
 #include "MyTextEdit.h"
 #include "QuizCard.h"
 #include "HoverButton.h"
+#include "QuizButton.h"
 #include <DragBarLabel.h>
 #include <MyInputDialog.h>
 #include <DropDownTextEdit.h>
@@ -53,7 +54,7 @@ private:
     void initializeExitAndMinimize();
     void initializeNotificationLabel();
     void initializeFonts();
-    void initializeFlashCard();
+    void initializeImageFiles();
     void initializeBackButton();
     void initializeQuizCreatorBackButton();
     void initializeNewCard();
@@ -69,15 +70,18 @@ private:
     void cardDisplayer();
     void fireAnimation();
     void reinitializeAll();
+    void updateQuizCardResolution();
+    void setScrollAreaStyleSheet(QScrollArea* scrollA);
 
     //If starting at 1920 x 1080
-    //float heightRatio = 1;
-    //float widthRatio = 1;
+    float heightRatio = 1;
+    float widthRatio = 1;
 
+/*
     //If starting at 1366 x 740
     float heightRatio = .7114583333;
     float widthRatio = .71111111;
-
+*/
     QStackedLayout* masterLayout;
     QLabel* backGround;
     Ui::MainWindow *ui;
@@ -127,7 +131,8 @@ private:
     HoverButton* lightningQuizButton;
     HoverButton* statisticsButton;
     HoverButton* optionsButton;
-    QPixmap* pix1;
+    QPixmap* flashCardImage;
+    QPixmap* mountainImage;
     QHBoxLayout *backGroundLayout;
 
 
@@ -167,12 +172,12 @@ private:
     QGridLayout* gridLayout;
     QWidget * quizViewport;
     QScrollArea *qscrollArea ;
-    QGridLayout *quizInner;
+    QVBoxLayout *quizInner;
     QWidget *quizGridLayoutWidget;
-    QGridLayout *quizGridLayout;
+    QVBoxLayout *quizGridLayout;
 
     QWidget *quizSelectWidget;
-    QGridLayout *quizSelectLayout;
+    QVBoxLayout *quizSelectLayout;
     QWidget *quizSelectGridWidget;
     QGridLayout *gridQuizSelectLayout;
 
