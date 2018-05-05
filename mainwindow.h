@@ -153,7 +153,7 @@ private:
     QScrollArea *scrollArea;
 
     QWidget *quizWidget;
-    QWidget *verticalLayoutWidget;
+    QWidget *quizCreateVerticalWidget;
     QVBoxLayout *verticalLayout;
 
     DropDownTextEdit* quizTextEdit;
@@ -173,10 +173,9 @@ private:
 
     QWidget *quizSelectWidget;
     QGridLayout *quizSelectLayout;
-    QWidget *verticalQuizSelectLayoutWidget;
-    QVBoxLayout *verticalQuizSelectLayout;
-    QSpacerItem *verticalQuizSelectSpacer_9;
-    QSpacerItem *verticalQuizSelectSpacer_5;
+    QWidget *quizSelectGridWidget;
+    QGridLayout *gridQuizSelectLayout;
+
     QGridLayout *quizSelectScrollViewer;
 
     //Fonts

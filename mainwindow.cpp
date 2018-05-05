@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 */
 
     this->resize(1366, 740);
-    heightRatio = .7114583333;
+    heightRatio = .71145833;
     widthRatio = .71111111;
 
     this->setFixedSize(1366, 740);
@@ -142,33 +142,40 @@ void MainWindow::newCardButtonClicked(){
 }
 
 void MainWindow::initializeQuizSelect(){
-    quizSelectWidget = new QWidget();
-    quizSelectLayout = new QGridLayout(quizSelectWidget);
-    quizSelectLayout->setAlignment(Qt::AlignCenter);
-    qDebug() << "a";
-    quizGridLayoutWidget = new QWidget();
-    quizGridLayout = new QGridLayout(quizGridLayoutWidget);
-    quizInner = new QGridLayout();
-    quizViewport = new QWidget();
-    quizViewport->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
-    quizViewport->setLayout(quizInner);
-    qscrollArea = new QScrollArea;
-    qscrollArea->setWidget(quizViewport);
-    quizGridLayout->addWidget(qscrollArea);
-    quizSelectLayout->addWidget(qscrollArea);
-    quizGridLayout->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
-    qDebug() << "B";
-    verticalQuizSelectLayoutWidget = new QWidget();
-    verticalQuizSelectLayout = new QVBoxLayout(verticalQuizSelectLayoutWidget);
-    verticalQuizSelectLayoutWidget->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
-    verticalQuizSelectLayoutWidget->setParent(quizSelectWidget);
-    quizGridLayout->setParent(quizSelectWidget);
-    qDebug() << "C";
+    QRect quizSelectQRect(QRect(this->width() * .1, this->height() * .05, this->width() * .5, this->height() * .75));
 
-        //Add the viewport to the scroll area
-    //quizSelectLayout->addWidget(verticalQuizSelectLayoutWidget);
-    //quizSelectLayout->addWidget(quizSelectWidget);
-qDebug() <<"D";
+    quizSelectWidget = new QWidget();
+    quizSelectWidget->setGeometry(quizSelectQRect);
+
+    quizSelectLayout = new QGridLayout(quizSelectWidget);
+    quizSelectLayout->setGeometry(quizSelectQRect);
+
+    quizSelectGridWidget = new QWidget();
+    quizGridLayout = new QGridLayout(quizSelectGridWidget);
+    quizGridLayout->setGeometry(quizSelectQRect);
+    quizInner = new QGridLayout();
+    quizInner->setGeometry(quizSelectQRect);
+
+    quizViewport = new QWidget();
+    quizViewport->setGeometry(quizSelectQRect);
+    quizViewport->setLayout(quizInner);
+
+    qscrollArea = new QScrollArea();
+    qscrollArea->setWidget(quizViewport);
+
+    quizGridLayout->addWidget(qscrollArea);
+
+    for(int i = 0; i < 50; i++){
+        HoverButton* test = new HoverButton();
+        test->setText(QString::number(i));
+        test->setMinimumSize(buttonWidth, buttonHeight);
+        test->setMaximumSize(buttonWidth, buttonHeight);
+        quizInner->addWidget(test, i, 0, Qt::AlignTop);
+    }
+
+    quizSelectLayout->addWidget(quizSelectGridWidget);
+    quizSelectGridWidget->setParent(quizSelectWidget);
+
     masterLayout->addWidget(quizSelectWidget);
 }
 
@@ -431,7 +438,8 @@ void MainWindow::quizSelectButtonClicked(){
 }
 
 void MainWindow::showQuizSelect(){
-    quizSelectLayout->addWidget(backButton, 0, 0);
+    backButton->show();
+    this->setPalette(QPalette());
     masterLayout->setCurrentWidget(quizSelectWidget);
 }
 
@@ -467,12 +475,8 @@ void MainWindow::initializeNewQuiz(){
     quizCreateWidget = new QWidget();
     quizCreateLayout = new QHBoxLayout(quizCreateWidget);
 
-    verticalLayoutWidget = new QWidget();
-    verticalLayout = new QVBoxLayout(verticalLayoutWidget);
-
-    //QLabel* spacer = new QLabel();
-    //spacer->setMinimumWidth(this->width()/2);
-    //verticalLayout->addWidget(spacer);
+    quizCreateVerticalWidget = new QWidget();
+    verticalLayout = new QVBoxLayout(quizCreateVerticalWidget);
 
     int offset = 2;
     //Text field for quiz names and selection
@@ -483,7 +487,7 @@ void MainWindow::initializeNewQuiz(){
     quizTextEdit->setText(quizTextEdit->getDefaultText());
     quizTextEdit->setFont(*textEditFont);
     quizTextEdit->move((this->width() * .255) - quizTextEdit->width()/2, (this->height() * .085) * offset + buttonHeight * 2);
-    quizTextEdit->setParent(verticalLayoutWidget);
+    quizTextEdit->setParent(quizCreateVerticalWidget);
 
     //Quiz Creation buttons
     createEditQuizButton = new HoverButton();
@@ -506,7 +510,7 @@ void MainWindow::initializeNewQuiz(){
         button->setMinimumSize(QSize(buttonWidth, buttonHeight));
         button->setFont(*buttonFont);
         button->move((this->width() * .25) - button->width()/2, (this->height() * .085) * offset + buttonHeight * 2);
-        button->setParent(verticalLayoutWidget);
+        button->setParent(quizCreateVerticalWidget);
         offset++;
     }
 
@@ -526,8 +530,8 @@ void MainWindow::initializeNewQuiz(){
 
     //Add the lest hand and right hand side to the main layout
     gridLayoutWidget->setGeometry(QRect(this->width()/2,this->height() * .05,this->width()/2,(950 * widthRatio)));
-    verticalLayoutWidget->setGeometry(QRect(0,this->height() * .05,this->width()/2,(950 * widthRatio)));
-    verticalLayoutWidget->setParent(quizCreateWidget);
+    quizCreateVerticalWidget->setGeometry(QRect(0,this->height() * .05,this->width()/2,(950 * widthRatio)));
+    quizCreateVerticalWidget->setParent(quizCreateWidget);
     gridLayoutWidget->setParent(quizCreateWidget);
 
     //Add the quiz creation menu to the master layout
