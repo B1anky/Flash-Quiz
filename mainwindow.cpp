@@ -9,17 +9,17 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     delete findChild<QMenuBar *>(); // NULL return value is ok for delete
 
 
-    this->resize(1920, 1040);
+    /*this->resize(1920, 1040);
     heightRatio = 1;
     widthRatio = 1;
     this->setFixedSize(1920, 1040);
+*/
 
-/*
     this->resize(1366, 740);
     heightRatio = .71145833;
     widthRatio = .71111111;
     this->setFixedSize(1366, 740);
-*/
+
     languageEnglish = true;
 
     //All layouts for every page will be stored here for easy separation of show and hide
@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     initializeNewQuiz();
     initializeOptions();
     initializeQuizSelect();
+    initializeLightningQuiz();
     resetFlashCardPalette();
 
     this->centralWidget()->setLayout(masterLayout);
@@ -215,8 +216,6 @@ void MainWindow::initializeQuizSelect(){
         button->setParent(quizSelectWidget);
         offset+=2;
     }
-
-
     masterLayout->addWidget(quizSelectWidget);
 }
 
@@ -507,8 +506,49 @@ void MainWindow::randomAllButtonClicked(){
 }
 
 void MainWindow::lightningQuizButtonClicked(){
-
+    showLightningQuiz();
 }
+
+void MainWindow::initializeLightningQuiz(){
+    QRect lightningQuizQRect(QRect(this->width() * .1, this->height() * .05, this->width() * .95, this->height() * .95));
+    lightningQuizWidget = new QWidget();
+    lightningQuizWidget->setGeometry(lightingQuizQRect);
+    lightningQuizWidget->setStyleSheet("border: transparent;");
+
+    lightningQuizLayout = new QVBoxLayout(lightningQuizWidget);
+    lightningQuizLayout->setGeometry(lightingQuizQRect);
+
+    lightningQuizInner = new QVBoxLayout();
+
+    lightningQuizViewport = new QWidget();
+    lightningQuizViewport->setGeometry(lightingQuizQRect);
+    lightningQuizViewport->setLayout(lightningQuizInner);
+    lightningQuizViewport->setParent(lightningQuizWidget);
+
+    HoverButton* lightningQuizStart = new HoverButton();
+    lightningQuizStart->setText("Start Quiz");
+    lightningQuizStart->setFont(*buttonFont);
+    lightningQuizStart->setMaximumSize(QSize(buttonWidth, buttonHeight));
+    lightningQuizStart->setMinimumSize(QSize(buttonWidth, buttonHeight));
+    lightningQuizStart->move((this->width() * .60) - buttonWidth, this->height() * .50);
+    lightningQuizStart->setParent(lightningQuizWidget);
+
+    masterLayout->addWidget(lightningQuizWidget);
+}
+
+void MainWindow::showLightningQuiz(){
+    backButton->show();
+    masterLayout->setCurrentWidget((lightningQuizWidget));
+    qint32 counter = 0;
+    lightningQuizTimer = new QTimer();
+    connect(lightningQuizTimer,SIGNAL(timeout()), this, SLOT(lightningQuizStart()));
+    lightningQuizTimer->start(3000);
+}
+
+void lightningQuizStart(){
+   qDebug() << "Quiz has started";
+}
+
 
 void MainWindow::statisticsButtonClicked(){
 

@@ -63,12 +63,14 @@ private:
     void initializeNewQuiz();
     void initializeOptions();
     void initializeQuizSelect();
+    void initializeLightningQuiz();
     void hideMenu();
     void showMenu();
     void showNewCard();
     void hideNewCard();
     void applyTone(int toneNum);
     void showMakeQuizMenu();
+    void showLightningQuiz();
     void hideQuizMenu();
     void cardDisplayer();
     void fireAnimation();
@@ -78,14 +80,14 @@ private:
     void allQuizButtonUpdater();
 
     //If starting at 1920 x 1080
-    float heightRatio = 1;
+   /* float heightRatio = 1;
     float widthRatio = 1;
+*/
 
-/*
     //If starting at 1366 x 740
     float heightRatio = .7114583333;
     float widthRatio = .71111111;
-*/
+
     QStackedLayout* masterLayout;
     QLabel* backGround;
     Ui::MainWindow *ui;
@@ -185,6 +187,13 @@ private:
     QWidget *quizGridLayoutWidget;
     QVBoxLayout *quizGridLayout;
 
+    QRect lightingQuizQRect;
+    QWidget* lightningQuizWidget;
+    QVBoxLayout* lightningQuizLayout;
+    QVBoxLayout* lightningQuizInner;
+    QWidget* lightningQuizViewport;
+    QTimer* lightningQuizTimer;
+
     QWidget *quizSelectWidget;
     QVBoxLayout *quizSelectLayout;
     QWidget *quizSelectGridWidget;
@@ -217,6 +226,7 @@ private slots:
     void lightningQuizButtonClicked();
     void statisticsButtonClicked();
     void optionsButtonClicked();
+    void lightningQuizStart();
 
     void backButtonClicked();
     void resetFlashCardPalette();
