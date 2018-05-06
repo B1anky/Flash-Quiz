@@ -14,4 +14,4 @@ public:
     bool event(QEvent* e);
 };
 
-#endif MINIMIZEBUTTON_H
+#endif // MINIMIZEBUTTON_H

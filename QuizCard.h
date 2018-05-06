@@ -1,15 +1,19 @@
 #ifndef QUIIZCARD_H
 #define QUIZCARD_H
 
-#include <QApplication>
-#include <QMouseEvent>
-#include <QString>
+#include <Card.h>
 #include <QPushButton>
-#include <card.h>
-#include <QPalette>
-#include <QtGlobal>
+#include <QHoverEvent>
+#include <QEvent>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+#include <QObject>
+#include <QColor>
 
 class QuizCard : public QPushButton {
+    Q_OBJECT
+    Q_PROPERTY(QColor color READ color WRITE setColor)
+    Q_PROPERTY(QColor color1 READ color1 WRITE setColor1)
 public:
     QuizCard();
     QuizCard(Card cardIn, QVector<Card*>& selectedCards);
@@ -18,10 +22,18 @@ public:
     Card getCard() const;
     Card* getCardRef() const;
     void setClicked(bool clickedIn);
+    void setColor(QColor color);
+    void setColor1 (QColor color);
+    QColor color();
+    QColor color1();
+    void hoverEnter(QHoverEvent* event);
+    void hoverLeave(QHoverEvent* event);
+    bool event(QEvent* e);
+    void mouseReleaseEvent(QMouseEvent * event);
 private:
     Card* card;
     bool clicked;
-    void mouseReleaseEvent(QMouseEvent * event);
+
 signals:
 
 public slots:

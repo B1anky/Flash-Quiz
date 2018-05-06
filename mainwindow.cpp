@@ -822,7 +822,6 @@ void MainWindow::allQuizButtonUpdater(){
 
     selectedQuizzes.clear();
 
-    int i = 0;
     for(int i = 0; i < quizList.size(); i++){
         QuizButton* button = new QuizButton();
         button->setText(quizList[i].first);
