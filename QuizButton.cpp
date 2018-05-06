@@ -3,7 +3,7 @@
 QuizButton::QuizButton(HoverButton *parent) : HoverButton(parent){
     setAttribute(Qt::WA_Hover);
     selected = false;
-    this->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
+    this->setStyleSheet("background-color: rgba(255, 255, 255);");
 }
 
 void QuizButton::hoverEnter(QHoverEvent* event){
@@ -14,13 +14,13 @@ void QuizButton::hoverEnter(QHoverEvent* event){
 
 void QuizButton::hoverLeave(QHoverEvent* event){
     if(!selected){
-        this->setStyleSheet("background-color: rgba(255, 255, 255, 25);");
+        this->setStyleSheet("background-color: rgba(255, 255, 255);");
     }
 }
 
 void QuizButton::mouseReleaseEvent(QMouseEvent * event){
     if(event->button() == Qt::LeftButton && !selected){
-        this->setStyleSheet("background-color: rgb(255, 0, 0);");
+        this->setStyleSheet("background-color: rgb(60,120,200); color: white");
         selected = true;
     }else if(event->button() == Qt::LeftButton && selected){
         this->setStyleSheet("background-color: rgba(0, 0, 0); color: white");

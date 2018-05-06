@@ -6,6 +6,8 @@
 #include "QuizCard.h"
 #include "HoverButton.h"
 #include "QuizButton.h"
+#include "ExitButton.h"
+#include "MinimizeButton.h"
 #include <DragBarLabel.h>
 #include <MyInputDialog.h>
 #include <DropDownTextEdit.h>
@@ -60,6 +62,7 @@ private:
     void initializeNewCard();
     void initializeNewQuiz();
     void initializeOptions();
+    void initializeQuizSelect();
     void hideMenu();
     void showMenu();
     void showNewCard();
@@ -70,8 +73,9 @@ private:
     void cardDisplayer();
     void fireAnimation();
     void reinitializeAll();
-    void updateQuizCardResolution();
+    void allCardUpdater();
     void setScrollAreaStyleSheet(QScrollArea* scrollA);
+    void allQuizButtonUpdater();
 
     //If starting at 1920 x 1080
     float heightRatio = 1;
@@ -102,6 +106,7 @@ private:
     QVector<HoverButton*> pinButtonList;
     QVector<Card*> userCards;
     QVector<Card*> selectedCards;
+    QMap<QString, QuizButton*> selectedQuizzes;
     QVector<QPair<QString, QVector<Card*>*>> quizList;
     QVector<QuizCard*> physicalCardButtonList;
 
@@ -112,8 +117,8 @@ private:
     DragBarLabel* dragBarLabel;
 
     //QObjects for Exit and minimize
-    HoverButton* exit;
-    HoverButton* minimize;
+    ExitButton* exit;
+    MinimizeButton* minimize;
 
     //QObjects for options
     HoverButton* x1366x740;
@@ -131,8 +136,12 @@ private:
     HoverButton* lightningQuizButton;
     HoverButton* statisticsButton;
     HoverButton* optionsButton;
-    QPixmap* flashCardImage;
-    QPixmap* mountainImage;
+    QPixmap* flashCardImageBase;
+    QPixmap* penImageBase;
+    QPixmap* flashCardImageScaled;
+    QPixmap* penImageScaled;
+    QPixmap* deskImageBase;
+    QPixmap* deskImageScaled;
     QHBoxLayout *backGroundLayout;
 
 
@@ -198,7 +207,6 @@ private:
 
 private slots:
     void showQuizSelect();
-    void initializeQuizSelect();
     void exitClicked();
     void minimizeClicked();
     void newCardButtonClicked();
@@ -221,7 +229,7 @@ private slots:
     void tone4ButtonClicked();
     void hideNotificationLabel();
 
-    void cardUpdater(Card newCard);
+    void cardAdder(Card newCard);
     void createEditQuizButton_clicked();
     void saveQuizButton_clicked();
     QString constructSaveFile();

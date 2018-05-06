@@ -20,7 +20,9 @@ SOURCES += main.cpp\
     HoverButton.cpp \
     MyInputDialog.cpp \
     DragBarLabel.cpp \
-    QuizButton.cpp
+    QuizButton.cpp \
+    ExitButton.cpp \
+    MinimizeButton.cpp
 
 HEADERS  += mainwindow.h \
     Card.h \
@@ -30,7 +32,9 @@ HEADERS  += mainwindow.h \
     HoverButton.h \
     MyInputDialog.h \
     DragBarLabel.h \
-    QuizButton.h
+    QuizButton.h \
+    ExitButton.h \
+    MinimizeButton.h
 
 FORMS    += mainwindow.ui \
     QuizEditor.ui \

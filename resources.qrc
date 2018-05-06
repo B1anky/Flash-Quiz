@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/pictures">
         <file>flash-card.png</file>
-        <file>mountains.png</file>
+        <file>penImage.png</file>
+        <file>desk.png</file>
     </qresource>
 </RCC>

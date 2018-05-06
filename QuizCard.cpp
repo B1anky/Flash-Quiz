@@ -14,7 +14,7 @@ QuizCard::QuizCard(Card cardIn, QVector<Card*>& selectedCardsIn){
 
 void QuizCard::mouseReleaseEvent(QMouseEvent * event){
     if(event->button() == Qt::LeftButton && !clicked){
-        this->setStyleSheet("background-color: rgb(255, 0, 0);");
+        this->setStyleSheet("background-color: rgb(60,120,200);");
         //Check to make sure it's not currently in the list due to a load
         for(auto card = selected->begin(); card != selected->end(); ++card){
             if(**card == *this->card){
