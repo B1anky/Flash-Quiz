@@ -193,6 +193,7 @@ private:
     QVBoxLayout* lightningQuizInner;
     QWidget* lightningQuizViewport;
     QTimer* lightningQuizTimer;
+    QLabel* lightningQuizCountdown;
 
     QWidget *quizSelectWidget;
     QVBoxLayout *quizSelectLayout;

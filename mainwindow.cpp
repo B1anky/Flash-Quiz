@@ -525,13 +525,13 @@ void MainWindow::initializeLightningQuiz(){
     lightningQuizViewport->setLayout(lightningQuizInner);
     lightningQuizViewport->setParent(lightningQuizWidget);
 
-    HoverButton* lightningQuizStart = new HoverButton();
-    lightningQuizStart->setText("Start Quiz");
-    lightningQuizStart->setFont(*buttonFont);
-    lightningQuizStart->setMaximumSize(QSize(buttonWidth, buttonHeight));
-    lightningQuizStart->setMinimumSize(QSize(buttonWidth, buttonHeight));
-    lightningQuizStart->move((this->width() * .60) - buttonWidth, this->height() * .50);
-    lightningQuizStart->setParent(lightningQuizWidget);
+    lightningQuizCountdown = new QLabel(this);
+    lightningQuizCountdown->setVisible(true);
+    lightningQuizCountdown->move((this->width() * .60) - buttonWidth, this->height() * .45);
+
+    QFont f( "Arial", 30, QFont::Bold);
+    lightningQuizCountdown->setFont( f);
+    lightningQuizCountdown->setParent(lightningQuizWidget);
 
     masterLayout->addWidget(lightningQuizWidget);
 }
@@ -539,14 +539,17 @@ void MainWindow::initializeLightningQuiz(){
 void MainWindow::showLightningQuiz(){
     backButton->show();
     masterLayout->setCurrentWidget((lightningQuizWidget));
-    qint32 counter = 0;
     lightningQuizTimer = new QTimer();
     connect(lightningQuizTimer,SIGNAL(timeout()), this, SLOT(lightningQuizStart()));
-    lightningQuizTimer->start(3000);
+    qint32 timeLeft = 0;
+    QTimer::singleShot(3000, [&](){
+        lightningQuizCountdown->setText(QString( "%1" ).arg(timeLeft++));
+    });
 }
 
-void lightningQuizStart(){
-   qDebug() << "Quiz has started";
+void MainWindow::lightningQuizStart(){
+
+   qDebug() << "hello";
 }
 
 
