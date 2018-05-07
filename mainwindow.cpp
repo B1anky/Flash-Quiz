@@ -836,7 +836,6 @@ void MainWindow::initializeLightningQuiz(){
     lightningQuizViewport->setLayout(lightningQuizInner);
     lightningQuizViewport->setParent(lightningQuizWidget);
 
-<<<<<<< HEAD
     HoverButton* lightningQuizButton = new HoverButton();
     lightningQuizButton->setText("Button Quiz");
     lightningQuizButton->setFont(*buttonFont);
@@ -844,7 +843,7 @@ void MainWindow::initializeLightningQuiz(){
     lightningQuizButton->setMinimumSize(QSize(buttonWidth, buttonHeight));
     lightningQuizButton->move((this->width() * .60) - buttonWidth, this->height() * .50);
     lightningQuizButton->setParent(lightningQuizWidget);
-=======
+
     lightningQuizCountdown = new QLabel(this);
     lightningQuizCountdown->setVisible(true);
     lightningQuizCountdown->move((this->width() * .60) - buttonWidth, this->height() * .45);
@@ -852,7 +851,6 @@ void MainWindow::initializeLightningQuiz(){
     QFont f( "Arial", 30, QFont::Bold);
     lightningQuizCountdown->setFont( f);
     lightningQuizCountdown->setParent(lightningQuizWidget);
->>>>>>> 85345a5ee25935e78317811fb6565ff1c8e502b6
 
     masterLayout->addWidget(lightningQuizWidget);
 }
@@ -869,12 +867,8 @@ void MainWindow::showLightningQuiz(){
 }
 
 void MainWindow::lightningQuizStart(){
-<<<<<<< HEAD
    qDebug() << "Quiz has started";
-=======
-
    qDebug() << "hello";
->>>>>>> 85345a5ee25935e78317811fb6565ff1c8e502b6
 }
 
 
