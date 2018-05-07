@@ -1,7 +1,7 @@
 #include "QuizCard.h"
 
 void QuizCard::setColor (QColor color){
-    this->setStyleSheet(QString("background-color: rgba(%1, %2, %3, %4); color: rgb(%4, %5, %6)").arg(color.red()).arg(color.green()).arg(color.blue()).arg(color.alpha()).arg(255 - color.red()).arg(255 - color.red()).arg(255 - color.red()));
+    this->setStyleSheet(QString("background-color: rgba(%1, %2, %3, %4); color: rgb(%4, %5, %6)").arg(color.red()).arg(color.green()).arg(color.blue()).arg(color.alpha()).arg(255 - color.red()).arg(255 - color.red()));
 }
 
 void QuizCard::setColor1 (QColor color){
@@ -103,36 +103,6 @@ QuizCard::QuizCard(Card cardIn, QVector<Card*>& selectedCardsIn){
     this->selected = &selectedCardsIn;
     clicked = false;
 }
-
-/*
-void QuizCard::mouseReleaseEvent(QMouseEvent * event){
-    if(event->button() == Qt::LeftButton && !clicked){
-        this->setStyleSheet("background-color: rgb(60,120,200);");
-        //Check to make sure it's not currently in the list due to a load
-        for(auto card = selected->begin(); card != selected->end(); ++card){
-            if(**card == *this->card){
-                //do nothing because it's already in the list due to a load
-                return;
-            }
-        }
-        selected->push_back(this->card);
-        clicked = true;
-    }else if(event->button() == Qt::LeftButton && clicked){
-        this->setStyleSheet("");
-        this->clearFocus();
-        //search selectedCards and remove
-        for(auto card = selected->begin(); card != selected->end(); ++card){
-            if(**card == *this->card){
-                selected->removeOne(*card);
-                break;
-            }
-        }
-
-        clicked = false;
-    }
-}
-*/
-
 
 bool QuizCard::event(QEvent* e){
     switch(e->type()){

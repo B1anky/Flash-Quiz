@@ -8,6 +8,7 @@
 #include "QuizButton.h"
 #include "ExitButton.h"
 #include "MinimizeButton.h"
+#include "DynamicFontSizeLabel.h"
 #include <DragBarLabel.h>
 #include <MyInputDialog.h>
 #include <DropDownTextEdit.h>
@@ -68,7 +69,7 @@ private:
     void showMenu();
     void showNewCard();
     void hideNewCard();
-    void applyTone(int toneNum);
+    void applyTone(int toneNum, MyTextEdit* pinyinT);
     void showMakeQuizMenu();
     void showLightningQuiz();
     void hideQuizMenu();
@@ -78,6 +79,7 @@ private:
     void allCardUpdater();
     void setScrollAreaStyleSheet(QScrollArea* scrollA);
     void allQuizButtonUpdater();
+    void startStandardQuiz();
 
     //If starting at 1920 x 1080
    /* float heightRatio = 1;
@@ -89,7 +91,7 @@ private:
     float widthRatio = .71111111;
 
     QStackedLayout* masterLayout;
-    QLabel* backGround;
+    DynamicFontSizeLabel* backGround;
     Ui::MainWindow *ui;
 
     QWidget* mainMenuWidget;
@@ -115,7 +117,7 @@ private:
     //Current profile's name
     QString profileName = "Guest";
 
-    //Qlabel that will be the drag bar on top
+    //DynamicFontSizeLabel that will be the drag bar on top
     DragBarLabel* dragBarLabel;
 
     //QObjects for Exit and minimize
@@ -129,7 +131,7 @@ private:
     QVector<HoverButton*> resolutionButtonList;
 
     //QObjects for main menu
-    QLabel* titleLabel;
+    DynamicFontSizeLabel* titleLabel;
     HoverButton* newCardButton;
     HoverButton* newQuizButton;
     HoverButton* loadProfileButton;
@@ -160,7 +162,7 @@ private:
     HoverButton* tone2Button;
     HoverButton* tone3Button;
     HoverButton* tone4Button;
-    QLabel* notificationLabel;
+    DynamicFontSizeLabel* notificationLabel;
 
 
     //QObjects for new / Edit Quiz
@@ -194,12 +196,43 @@ private:
     QWidget* lightningQuizViewport;
     QTimer* lightningQuizTimer;
 
+    //QObjects for Quiz select
     QWidget *quizSelectWidget;
     QVBoxLayout *quizSelectLayout;
     QWidget *quizSelectGridWidget;
     QGridLayout *gridQuizSelectLayout;
-
     QGridLayout *quizSelectScrollViewer;
+    QVector<bool> standardQuizOptions;
+
+    HoverButton* startQuizButton;
+    HoverButton* studyQuizButton;
+    QuizButton* englishSelectedButton;
+    QuizButton* pinyinSelectedButton;
+    QuizButton* chineseSelectedButton;
+
+
+    //QObjects for standard quiz
+    QVector<Card> standardQuizCards;
+    QWidget* standardQuizWidget;
+    HoverButton* nextCardButton;
+    MyTextEdit* englishQuizText;
+    MyTextEdit* pinyinQuizText;
+    MyTextEdit* chineseQuizText;
+    DynamicFontSizeLabel* remainingCardsLabel;
+    DynamicFontSizeLabel* englishQuizLabel;
+    DynamicFontSizeLabel* pinyinQuizLabel;
+    DynamicFontSizeLabel* chineseQuizLabel;
+    QVector<MyTextEdit*> standardQuizTextEditList;
+    QVector<DynamicFontSizeLabel*> standardQuizTextLabel;
+    HoverButton* tone0ButtonSQ;
+    HoverButton* tone1ButtonSQ;
+    HoverButton* tone2ButtonSQ;
+    HoverButton* tone3ButtonSQ;
+    HoverButton* tone4ButtonSQ;
+    QVector<HoverButton*> pinButtonListSQ;
+    QVector<Card>::iterator iteratorSQ;
+    int cardCount;
+
 
     //Fonts
     QFont* titleFont = new QFont();
@@ -208,6 +241,7 @@ private:
     QFont* pinyinButtonFont = new QFont();
     QFont* textEditFont = new QFont();
     QFont* exitAndMinimizeFont = new QFont();
+    QFont* standardQuizFont = new QFont();
 
 
     //Default widget heights/ widths
@@ -227,6 +261,7 @@ private slots:
     void statisticsButtonClicked();
     void optionsButtonClicked();
     void lightningQuizStart();
+    void beginStandardQuiz();
 
     void backButtonClicked();
     void resetFlashCardPalette();
@@ -237,6 +272,13 @@ private slots:
     void tone2ButtonClicked();
     void tone3ButtonClicked();
     void tone4ButtonClicked();
+
+    void tone0ButtonClickedSQ();
+    void tone1ButtonClickedSQ();
+    void tone2ButtonClickedSQ();
+    void tone3ButtonClickedSQ();
+    void tone4ButtonClickedSQ();
+
     void hideNotificationLabel();
 
     void cardAdder(Card newCard);
@@ -249,7 +291,10 @@ private slots:
     void deleteSelectedCardsButton_clicked();
 
     void resolutionChangedx1366x740();
+    void checkValidation();
     void resolutionChangedx1920x1040();
+
+    void nextCardSQ();
 
 };
 

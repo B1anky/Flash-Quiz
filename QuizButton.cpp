@@ -1,9 +1,10 @@
 #include "QuizButton.h"
 
-QuizButton::QuizButton(HoverButton *parent) : HoverButton(parent){
+QuizButton::QuizButton(HoverButton *parent, QVector<bool>* standardQuizOptions) : HoverButton(parent){
     setAttribute(Qt::WA_Hover);
     selected = false;
     this->setStyleSheet("background-color: rgba(255, 255, 255);");
+    this->quizOptions = standardQuizOptions;
 }
 
 void QuizButton::setColor (QColor color){
@@ -60,6 +61,27 @@ void QuizButton::hoverLeave(QHoverEvent* event){
     }
 }
 
+void QuizButton::mousePressEvent(QMouseEvent *event){
+    if(event->button() == Qt::LeftButton && !selected){
+        if(this->text() == "English Mode"){
+            (*quizOptions)[0] = true;
+        }else if(this->text() == "Pinyin Mode"){
+            (*quizOptions)[1] = true;
+        }else if(this->text() == "Chinese Mode"){
+            (*quizOptions)[2] = true;
+        }
+    }else if(event->button() == Qt::LeftButton && selected){
+        if(this->text() == "English Mode"){
+            (*quizOptions)[0] = false;
+        }else if(this->text() == "Pinyin Mode"){
+            (*quizOptions)[1] = false;
+        }else if(this->text() == "Chinese Mode"){
+            (*quizOptions)[2] = false;
+        }
+    }
+    QPushButton::mousePressEvent(event);
+}
+
 void QuizButton::mouseReleaseEvent(QMouseEvent * event){
     if(event->button() == Qt::LeftButton && !selected){
         //this->setStyleSheet("background-color: rgb(60,120,200); color: white");
@@ -75,11 +97,12 @@ void QuizButton::mouseReleaseEvent(QMouseEvent * event){
         //this->setStyleSheet("background-color: rgba(0, 0, 0); color: white");
         QPropertyAnimation *fadeToBlack = new QPropertyAnimation(this,"color");
         fadeToBlack->setDuration(500);
-        fadeToBlack->setStartValue(QColor(255,255,255));
+        fadeToBlack->setStartValue(QColor(0,191,255));
         fadeToBlack->setEndValue(QColor(0,0,0));
         fadeToBlack->start();
         selected = false;
     }
+    QPushButton::mouseReleaseEvent(event);
 }
 
 bool QuizButton::event(QEvent* e){

@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     DragBarLabel.cpp \
     QuizButton.cpp \
     ExitButton.cpp \
-    MinimizeButton.cpp
+    MinimizeButton.cpp \
+    DynamicFontSizeLabel.cpp
 
 HEADERS  += mainwindow.h \
     Card.h \
@@ -34,7 +35,8 @@ HEADERS  += mainwindow.h \
     DragBarLabel.h \
     QuizButton.h \
     ExitButton.h \
-    MinimizeButton.h
+    MinimizeButton.h \
+    DynamicFontSizeLabel.h
 
 FORMS    += mainwindow.ui \
     QuizEditor.ui \
@@ -43,4 +45,4 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     resources.qrc
 
-CONFIG += c++11
+CONFIG += c++14
