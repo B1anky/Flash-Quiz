@@ -844,14 +844,6 @@ void MainWindow::initializeLightningQuiz(){
     lightningQuizButton->move((this->width() * .60) - buttonWidth, this->height() * .50);
     lightningQuizButton->setParent(lightningQuizWidget);
 
-    lightningQuizCountdown = new QLabel(this);
-    lightningQuizCountdown->setVisible(true);
-    lightningQuizCountdown->move((this->width() * .60) - buttonWidth, this->height() * .45);
-
-    QFont f( "Arial", 30, QFont::Bold);
-    lightningQuizCountdown->setFont( f);
-    lightningQuizCountdown->setParent(lightningQuizWidget);
-
     masterLayout->addWidget(lightningQuizWidget);
 }
 
@@ -860,15 +852,94 @@ void MainWindow::showLightningQuiz(){
     masterLayout->setCurrentWidget((lightningQuizWidget));
     lightningQuizTimer = new QTimer();
     connect(lightningQuizTimer,SIGNAL(timeout()), this, SLOT(lightningQuizStart()));
-    qint32 timeLeft = 0;
+    lightningQuizTimer->start();
+    /*qint32 timeLeft = 0;
     QTimer::singleShot(3000, [&](){
         lightningQuizCountdown->setText(QString( "%1" ).arg(timeLeft++));
-    });
+    });*/
 }
 
 void MainWindow::lightningQuizStart(){
-   qDebug() << "Quiz has started";
+   lightningQuizTimer->stop();
+   lightningQuizRound();
    qDebug() << "hello";
+}
+
+bool MainWindow::lightningQuizRound(){
+    QVector<int> options;
+    int quizzedCard = qrand() % (userCards.size()-1);
+    for(int i = 0; i < 4;i++){
+        options.append(qrand() % (userCards.size()-1));
+    }
+    for(int i : options){
+        while(i == quizzedCard){
+            i = qrand() % (userCards.size()-1);
+        }
+    }
+    options.append(quizzedCard);
+    //std::shuffle(options.begin(),options.end());
+
+    QLabel * englishPhrase = new QLabel(this);
+    englishPhrase->setText(userCards[quizzedCard]->getEnglish());
+    englishPhrase->setVisible(true);
+    englishPhrase->move((this->width() * .60) - buttonWidth, this->height() * .45);
+    QFont f( "Arial", 30, QFont::Bold);
+    englishPhrase->setFont( f);
+    englishPhrase->setParent(lightningQuizWidget);
+    int answer = qrand() % 2;
+
+    QVector<QPair<int,bool>> choices;
+
+    HoverButton* optionOne = new HoverButton();
+    optionOne->setFont(*buttonFont);
+    optionOne->setMaximumSize(QSize(buttonWidth, buttonHeight));
+    optionOne->setMinimumSize(QSize(buttonWidth, buttonHeight));
+    optionOne->move((this->width() * .60) - buttonWidth, this->height() * .50);
+    optionOne->setParent(lightningQuizWidget);
+
+    HoverButton* optionTwo = new HoverButton();
+    optionTwo->setFont(*buttonFont);
+    optionTwo->setMaximumSize(QSize(buttonWidth, buttonHeight));
+    optionTwo->setMinimumSize(QSize(buttonWidth, buttonHeight));
+    optionTwo->move((this->width() * .60) - buttonWidth, this->height() * .50);
+    optionTwo->setParent(lightningQuizWidget);
+
+    HoverButton* optionThree = new HoverButton();
+    optionThree->setFont(*buttonFont);
+    optionThree->setMaximumSize(QSize(buttonWidth, buttonHeight));
+    optionThree->setMinimumSize(QSize(buttonWidth, buttonHeight));
+    optionThree->move((this->width() * .60) - buttonWidth, this->height() * .50);
+    optionThree->setParent(lightningQuizWidget);
+
+    HoverButton* optionFour = new HoverButton();
+    optionFour->setFont(*buttonFont);
+    optionFour->setMaximumSize(QSize(buttonWidth, buttonHeight));
+    optionFour->setMinimumSize(QSize(buttonWidth, buttonHeight));
+    optionFour->move((this->width() * .60) - buttonWidth, this->height() * .50);
+    optionFour->setParent(lightningQuizWidget);
+
+    HoverButton* optionFive = new HoverButton();
+    optionFive->setFont(*buttonFont);
+    optionFive->setMaximumSize(QSize(buttonWidth, buttonHeight));
+    optionFive->setMinimumSize(QSize(buttonWidth, buttonHeight));
+    optionFive->move((this->width() * .60) - buttonWidth, this->height() * .50);
+    optionFive->setParent(lightningQuizWidget);
+
+    if(answer == 0){
+        optionOne->setText(userCards[options[0]]->getPinyin());
+        optionTwo->setText(userCards[options[1]]->getPinyin());
+        optionThree->setText(userCards[options[2]]->getPinyin());
+        optionFour->setText(userCards[options[3]]->getPinyin());
+        optionFive->setText(userCards[options[4]]->getPinyin());
+    }else if(answer == 1){
+        optionOne->setText(userCards[options[0]]->getChinese());
+        optionTwo->setText(userCards[options[1]]->getChinese());
+        optionThree->setText(userCards[options[2]]->getChinese());
+        optionFour->setText(userCards[options[3]]->getChinese());
+        optionFive->setText(userCards[options[4]]->getChinese());
+    }
+    masterLayout->setCurrentWidget((lightningQuizWidget));
+    return true;
 }
 
 
