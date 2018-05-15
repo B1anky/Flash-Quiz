@@ -240,7 +240,8 @@ private:
     QFont* buttonFont = new QFont();
     QFont* cardFont = new QFont();
     QFont* pinyinButtonFont = new QFont();
-    QFont* textEditFont = new QFont();
+    QFont* cardTextEditFont = new QFont();
+    QFont* quizNameTextEditFont = new QFont();
     QFont* exitAndMinimizeFont = new QFont();
     QFont* standardQuizFont = new QFont();
 

@@ -2,6 +2,8 @@
 
 MyTextEdit::MyTextEdit(QTextEdit *parent) : QTextEdit(parent){
     QTextEdit::setTabChangesFocus(true);
+    this->setFrameStyle(QFrame::NoFrame);
+    this->setAttribute(Qt::WA_TranslucentBackground);
 }
 
 void MyTextEdit::setDefaultText(QString str){
