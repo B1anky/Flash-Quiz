@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     QuizButton.cpp \
     ExitButton.cpp \
     MinimizeButton.cpp \
-    DynamicFontSizeLabel.cpp
+    DynamicFontSizeLabel.cpp \
+    ClockThread.cpp
 
 HEADERS  += mainwindow.h \
     Card.h \
@@ -36,7 +37,8 @@ HEADERS  += mainwindow.h \
     QuizButton.h \
     ExitButton.h \
     MinimizeButton.h \
-    DynamicFontSizeLabel.h
+    DynamicFontSizeLabel.h \
+    ClockThread.h
 
 FORMS    += mainwindow.ui \
     QuizEditor.ui \

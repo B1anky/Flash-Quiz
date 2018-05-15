@@ -864,20 +864,31 @@ void MainWindow::initializeLightningQuiz(){
 
 void MainWindow::showLightningQuiz(){
     backButton->show();
-    masterLayout->setCurrentWidget((lightningQuizWidget));
-    lightningQuizTimer = new QTimer();
-    connect(lightningQuizTimer,SIGNAL(timeout()), this, SLOT(lightningQuizStart()));
-    lightningQuizTimer->start();
-    /*qint32 timeLeft = 0;
-    QTimer::singleShot(3000, [&](){
-        lightningQuizCountdown->setText(QString( "%1" ).arg(timeLeft++));
-    });*/
+    masterLayout->setCurrentWidget(lightningQuizWidget);
+
+    lightningQuizCountdown = new QLabel();
+    lightningQuizCountdown->setMinimumHeight(buttonHeight);
+    lightningQuizCountdown->setMinimumWidth(buttonWidth);
+    lightningQuizCountdown->setParent(lightningQuizWidget);
+    lightningQuizCountdown->setFont(*titleFont);
+    lightningQuizCountdown->move(this->width()/2, this->height()/2);
+    //lightningQuizCountdown->setAlignment(Qt::AlignCenter);
+    //lightningQuizCountdown->setText("3.000");
+    lightningQuizCountdown->show();
+
+    ClockThread clockThread;
+    connect(&clockThread, SIGNAL(sendTime(QString)), lightningQuizCountdown, SLOT(setText(QString)), Qt::QueuedConnection);
+    connect(&clockThread, SIGNAL(timerDone()),  this, SLOT(lightningQuizStart()),Qt::QueuedConnection);
+    clockThread.run();
+
+    //connect(lightningQuizTimer,SIGNAL(timeout()), this, SLOT(lightningQuizStart()));
 }
 
 void MainWindow::lightningQuizStart(){
-   lightningQuizTimer->stop();
-   lightningQuizRound();
-   qDebug() << "hello";
+   //lightningQuizTimer->stop();
+   //lightningQuizRound();
+   lightningQuizCountdown->deleteLater();
+
 }
 
 bool MainWindow::lightningQuizRound(){

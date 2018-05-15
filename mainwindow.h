@@ -9,6 +9,7 @@
 #include "ExitButton.h"
 #include "MinimizeButton.h"
 #include "DynamicFontSizeLabel.h"
+#include "ClockThread.h"
 #include <DragBarLabel.h>
 #include <MyInputDialog.h>
 #include <DropDownTextEdit.h>
@@ -34,6 +35,7 @@
 #include <QDesktopWidget>
 #include <QResizeEvent>
 #include <QStackedLayout>
+#include <QThread>
 
 
 
