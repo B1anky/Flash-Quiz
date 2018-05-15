@@ -80,6 +80,7 @@ private:
     void setScrollAreaStyleSheet(QScrollArea* scrollA);
     void allQuizButtonUpdater();
     void startStandardQuiz();
+    bool lightningQuizRound();
 
     //If starting at 1920 x 1080
    /* float heightRatio = 1;
