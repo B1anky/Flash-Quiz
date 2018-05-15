@@ -1738,10 +1738,10 @@ void MainWindow::saveQuizButton_clicked(){
 
             file.close();
 
-            notificationLabel->setText(profileName + ", your profile has been saved!");
+            notificationLabel->setText(profileName + ", profile saved!");
             notificationLabel->setStyleSheet("color:black");
-            notificationLabel->move(this->width()/2 - notificationLabel->width()/2 + (25 * widthRatio), this->height()/2  - notificationLabel->height()/2 - (300 * heightRatio));
-            notificationLabel->setAlignment(Qt::AlignCenter);
+            notificationLabel->move(175 * widthRatio, this->height()/2  - notificationLabel->height()/2 - (300 * heightRatio));
+            notificationLabel->setAlignment(Qt::AlignLeft);
             fireAnimation();
         }
     }
