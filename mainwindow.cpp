@@ -871,17 +871,14 @@ void MainWindow::showLightningQuiz(){
     lightningQuizCountdown->setMinimumWidth(buttonWidth);
     lightningQuizCountdown->setParent(lightningQuizWidget);
     lightningQuizCountdown->setFont(*titleFont);
-    lightningQuizCountdown->move(this->width()/2, this->height()/2);
-    //lightningQuizCountdown->setAlignment(Qt::AlignCenter);
-    //lightningQuizCountdown->setText("3.000");
+    lightningQuizCountdown->move(this->width()/2, this->height()/16);
     lightningQuizCountdown->show();
 
-    ClockThread clockThread;
-    connect(&clockThread, SIGNAL(sendTime(QString)), lightningQuizCountdown, SLOT(setText(QString)), Qt::QueuedConnection);
-    connect(&clockThread, SIGNAL(timerDone()),  this, SLOT(lightningQuizStart()),Qt::QueuedConnection);
-    clockThread.run();
-
-    //connect(lightningQuizTimer,SIGNAL(timeout()), this, SLOT(lightningQuizStart()));
+    //Maintains the timer for the flash quiz
+    clockThread = new ClockThread();
+    connect(clockThread, SIGNAL(sendTime(QString)), lightningQuizCountdown, SLOT(setText(QString)), Qt::QueuedConnection);
+    connect(clockThread, SIGNAL(timerDone()),  this, SLOT(lightningQuizStart()), Qt::QueuedConnection);
+    clockThread->start();
 }
 
 void MainWindow::lightningQuizStart(){
@@ -990,6 +987,11 @@ void MainWindow::backButtonClicked(){
     showMenu();
     resetFlashCardPalette();
     backButton->hide();
+    //Need this in case the user presses back before the timer runs out and somehow starts again super fast
+    if(clockThread != nullptr && clockThread->isRunning()){
+        clockThread->forceDone = true;
+        lightningQuizCountdown->hide();
+    }
 }
 
 
@@ -1264,6 +1266,7 @@ void MainWindow::reinitializeAll(){
     initializeExitAndMinimize();
     allCardUpdater();
     allQuizButtonUpdater();
+    initializeLightningQuiz();
 
     masterLayout->setCurrentWidget(optionsWidget);
 

@@ -13,6 +13,7 @@ class ClockThread : public QThread{
 public:
     ClockThread();
     void run();
+    bool forceDone = false;
 signals:
     void sendTime(QString time);
     void timerDone();

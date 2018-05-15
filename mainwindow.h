@@ -197,8 +197,8 @@ private:
     QVBoxLayout* lightningQuizLayout;
     QVBoxLayout* lightningQuizInner;
     QWidget* lightningQuizViewport;
-    QTimer* lightningQuizTimer;
-    QLabel* lightningQuizCountdown;
+    ClockThread* clockThread = nullptr;
+    QLabel* lightningQuizCountdown = nullptr;
 
     //QObjects for Quiz select
     QWidget *quizSelectWidget;
